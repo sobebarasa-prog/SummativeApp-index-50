@@ -120,6 +120,37 @@ button,input,textarea,select{font-family:inherit;outline:none}
     .tot-row td { background: #e8e8e8 !important; border: 1px solid #000; }
 }
 
+/* EXAM ANALYSIS STYLES */
+.ana-section-btn { padding:8px 14px; border:2px solid var(--border); background:var(--wh); cursor:pointer; font-weight:800; font-size:11px; border-radius:8px; color:var(--sub); transition:0.2s; }
+.ana-section-btn.active { background:var(--nav); color:#fff; border-color:var(--nav); }
+.ana-subtitle { font-weight:900; font-size:12px; color:var(--nav); border-bottom:2px solid var(--nav); padding-bottom:5px; margin:18px 0 10px; text-transform:uppercase; letter-spacing:.5px; }
+.ana-subsub { font-size:9px; font-weight:800; color:var(--sub); text-transform:uppercase; letter-spacing:.8px; margin:12px 0 5px; }
+.ana-subj-block { margin-bottom:18px; border-left:3px solid var(--b); padding-left:10px; }
+.ana-subj-name { font-weight:900; color:var(--b); font-size:11px; text-transform:uppercase; margin-bottom:6px; }
+.ana-grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.ana-dev-pos { color:var(--g); font-weight:900; }
+.ana-dev-neg { color:var(--r); font-weight:900; }
+.ana-dev-neu { color:var(--sub); font-weight:700; }
+.ana-print-header { text-align:center; margin-bottom:15px; border-bottom:2px solid #000; padding-bottom:10px; }
+.ana-print-header h2 { margin:0; font-size:17px; }
+.ana-print-header h3 { margin:4px 0 0; font-size:12px; font-weight:700; }
+.ana-grade-tag { display:inline-block; background:var(--nav); color:#fff; padding:2px 8px; border-radius:4px; font-size:10px; font-weight:900; margin-right:5px; }
+.chart-container { position:relative; width:100%; margin-bottom:20px; }
+@media print {
+  .ana-section-btn, #anaNavBar { display:none!important; }
+  .ana-print-header { display:block!important; }
+  canvas { max-width:100%!important; }
+}
+.exam-score-pv { display:none; }
+@media print {
+  .exam-score-pv { display:inline !important; font-weight:700; font-size:11px; }
+}
+@media print {
+  body.tt-landscape { }
+}
+.tt-print-btn { padding:8px 14px; background:#444; color:white; border:none; cursor:pointer; font-weight:bold; border-radius:4px; font-size:12px; }
+.excel-btn { padding:8px 12px; background:#217346; color:white; border:none; cursor:pointer; font-weight:bold; border-radius:4px; font-size:11px; }
+
 /* TIMETABLE STYLES */
 .tt-table-wrapper { width: 100%; overflow-x: auto; margin-top: 10px; border: 1px solid #eee; }
 .tt-entity-label { font-size: 20px; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; margin-top: 15px; text-align: center; width: 100%; display: block; }
@@ -274,8 +305,9 @@ button,input,textarea,select{font-family:inherit;outline:none}
           <select class="fsel" id="exSel" onchange="renderExamConfig()">
             </select>
         </div>
-        <button class="btn btn-b" style="padding:8px 12px; font-size:11px; height:36px" onclick="editExamTitle()">✏️ Edit Title</button>
-        <button class="btn btn-b" style="padding:8px 12px; font-size:11px; height:36px" onclick="addNewExamPeriod()">+ Add Period</button>
+        <button class="btn btn-b" style="padding:8px 12px; font-size:11px; height:36px" onclick="editExamTitle()">✏️ Edit</button>
+        <button class="btn btn-b" style="padding:8px 12px; font-size:11px; height:36px" onclick="addNewExamPeriod()">+ Add</button>
+        <button class="btn btn-r" style="padding:8px 12px; font-size:11px; height:36px" onclick="removeExamPeriod()">🗑 Remove</button>
       </div>
       <div id="examConfigUI"></div>
     </div>
@@ -283,17 +315,122 @@ button,input,textarea,select{font-family:inherit;outline:none}
     <div class="card">
       <div class="ch no-print" id="markSheetTitle">Official Mark Sheet</div>
       <div id="examEntryUI" style="overflow-x:auto"></div>
-      <button class="btn btn-g no-print" id="printMarkBtn" style="width:100%; margin-top:15px; display:none" onclick="window.print()">Print Subject Mark Sheet</button>
+      <div style="display:flex; gap:8px; margin-top:15px">
+        <button class="btn btn-g no-print" id="printMarkBtn" style="flex:1; display:none" onclick="window.print()">🖨 Print Mark Sheet</button>
+        <button class="excel-btn no-print" id="exportMarkBtn" style="flex:1; display:none" onclick="exportToCSV('examEntryUI','Mark_Sheet')">📥 Export Excel</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="s-analysis" class="screen">
+    <!-- Section Navigation Bar -->
+    <div id="anaNavBar" class="card no-print" style="padding:10px; margin-bottom:8px">
+      <div style="font-size:9px; font-weight:800; color:var(--sub); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px">EXAM ANALYSIS MODULE</div>
+      <div style="display:flex; gap:6px; flex-wrap:wrap;">
+        <button class="ana-section-btn active" id="anaBtnA" onclick="switchAnaSection('A')">📊 A. Grade Analysis</button>
+        <button class="ana-section-btn" id="anaBtnB" onclick="switchAnaSection('B')">🏫 B. School Analysis</button>
+        <button class="ana-section-btn" id="anaBtnC" onclick="switchAnaSection('C')">👤 C. Learner Graphs</button>
+      </div>
+    </div>
+
+    <!-- ====== SECTION A: GRADE PERFORMANCE ANALYSIS ====== -->
+    <div id="anaSection_A">
+      <div class="card no-print">
+        <div class="ch">A. GRADE PERFORMANCE ANALYSIS</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:8px">
+          <div><label class="fl">Select Term</label>
+            <select class="fsel" id="anaTermSel_A">
+              <option value="t1">Term 1</option><option value="t2">Term 2</option><option value="t3">Term 3</option>
+            </select>
+          </div>
+          <div><label class="fl">Exam Period</label>
+            <select class="fsel" id="anaExamSel_A">
+              <option value="">-- Select Exam Period --</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-bottom:8px"><label class="fl">Select Grade</label>
+          <select class="fsel" id="anaGradeSel_A">
+            <option value="">-- Select Grade --</option>
+            <option value="7">Grade 7</option><option value="8">Grade 8</option><option value="9">Grade 9</option>
+          </select>
+        </div>
+        <button class="btn btn-b" style="width:100%" onclick="genGradeAnalysis()">📊 Generate Grade Analysis</button>
+      </div>
+      <div id="anaGradeContent" style="display:none"></div>
+    </div>
+
+    <!-- ====== SECTION B: SCHOOL ANALYSIS ====== -->
+    <div id="anaSection_B" style="display:none">
+      <div class="card no-print">
+        <div class="ch">B. SCHOOL ANALYSIS (All Grades: 7, 8 & 9)</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:8px">
+          <div><label class="fl">Select Term</label>
+            <select class="fsel" id="anaTermSel_B">
+              <option value="t1">Term 1</option><option value="t2">Term 2</option><option value="t3">Term 3</option>
+            </select>
+          </div>
+          <div><label class="fl">Exam Period</label>
+            <select class="fsel" id="anaExamSel_B">
+              <option value="">-- Select Exam Period --</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-b" style="width:100%" onclick="genSchoolAnalysis()">🏫 Generate School Analysis</button>
+      </div>
+      <div id="anaSchoolContent" style="display:none"></div>
+    </div>
+
+    <!-- ====== SECTION C: INDIVIDUAL LEARNER GRAPHS ====== -->
+    <div id="anaSection_C" style="display:none">
+      <div class="card no-print">
+        <div class="ch">C. INDIVIDUAL LEARNER ANALYSIS GRAPHS</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:8px">
+          <div><label class="fl">Select Term</label>
+            <select class="fsel" id="anaTermSel_C">
+              <option value="t1">Term 1</option><option value="t2">Term 2</option><option value="t3">Term 3</option>
+            </select>
+          </div>
+          <div><label class="fl">Select Grade</label>
+            <select class="fsel" id="anaGradeSel_C" onchange="anaPopulateLearners()">
+              <option value="">-- Select Grade --</option>
+              <option value="7">Grade 7</option><option value="8">Grade 8</option><option value="9">Grade 9</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-bottom:8px"><label class="fl">Select Learner</label>
+          <select class="fsel" id="anaLearnerSel_C" onchange="genLearnerGraphs()">
+            <option value="">-- Select Learner --</option>
+          </select>
+        </div>
+      </div>
+      <div id="anaGraphContent" style="display:none"></div>
     </div>
   </div>
 
   <div id="s-finance" class="screen">
     <div class="card">
-      <div class="ch">Fee Structure Editor <button class="btn btn-b no-print" style="padding:4px 10px; font-size:9px" onclick="window.print()">Print Structure</button></div>
+      <div class="ch">Fee Structure Editor <button class="btn btn-b no-print" style="padding:4px 10px; font-size:9px" onclick="printFeeStructure()">🖨 Print Structure</button></div>
       <div id="feeItemsList"></div>
       <button class="btn btn-b no-print" style="width:100%; margin-top:5px; padding:6px" onclick="addFeeItem()">+ Add New Fee Item</button>
       <div style="margin-top:10px; border-top:2px solid var(--nav); padding-top:8px">
           <div class="fin-row" style="font-weight:900; font-size:14px"><span>TOTAL FEES:</span> <span id="totalFeeLabel">0</span></div>
+      </div>
+      <div style="display:flex; gap:8px; margin-top:10px" class="no-print">
+        <button class="btn btn-b" style="flex:1; padding:8px" onclick="printFeeStructure()">🖨 Print Fee Structure</button>
+        <button class="excel-btn" style="flex:1; padding:8px" onclick="exportToCSV('feeStructurePrintTable','Fee_Structure')">📥 Export Excel</button>
+      </div>
+      <!-- Print-only fee structure table -->
+      <div id="feeStructurePrintArea" class="only-print" style="margin-top:15px">
+        <div style="text-align:center; border-bottom:2px solid #000; padding-bottom:8px; margin-bottom:10px">
+          <h2 style="margin:0" id="feePrintSchool"></h2>
+          <h3 style="margin:4px 0 0; font-size:13px">FEE STRUCTURE</h3>
+        </div>
+        <table class="tbl" id="feeStructurePrintTable">
+          <thead><tr><th>#</th><th>Fee Item</th><th>Amount</th></tr></thead>
+          <tbody id="feeStructurePrintBody"></tbody>
+          <tfoot><tr class="tot-row"><td colspan="2"><b>TOTAL</b></td><td id="feePrintTotal" style="font-weight:900"></td></tr></tfoot>
+        </table>
       </div>
     </div>
     <div class="card no-print">
@@ -303,6 +440,16 @@ button,input,textarea,select{font-family:inherit;outline:none}
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
         <div><label class="fl">Amount Paid</label><input type="number" class="fi" id="payAmt"></div>
         <div><label class="fl">Payment Date</label><input type="date" class="fi" id="payDate"></div>
+      </div>
+      <label class="fl">Mode of Payment</label>
+      <select class="fsel" id="payMode" onchange="toggleTxnField()">
+        <option value="Cash">Cash</option>
+        <option value="M-Pesa">M-Pesa</option>
+        <option value="School Account">School Account</option>
+      </select>
+      <div id="txnCodeRow" style="display:none">
+        <label class="fl">Transaction Code / Receipt No.</label>
+        <input class="fi" id="payTxnCode" placeholder="e.g. QHX12345ABC or Receipt #001">
       </div>
       <button class="btn btn-g" style="width:100%" onclick="recordPayment()">Save & Generate Receipt</button>
     </div>
@@ -501,13 +648,21 @@ button,input,textarea,select{font-family:inherit;outline:none}
 
       <div id="classViewTT" style="display:none">
         <div style="font-size:20px; font-weight:bold; margin-bottom:15px; text-transform:uppercase; margin-top:15px; text-align:center; width:100%; display:block" id="classLabel">CLASS TIMETABLE</div>
-        <div class="no-print" style="text-align:center; margin-bottom:15px"><select id="classPicker" onchange="renderClassView()" style="padding:8px 12px; border:1px solid #ccc; background:#fff; cursor:pointer; font-weight:bold; border-radius:4px"></select></div>
+        <div class="no-print" style="text-align:center; margin-bottom:10px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap">
+          <select id="classPicker" onchange="renderClassView()" style="padding:8px 12px; border:1px solid #ccc; background:#fff; cursor:pointer; font-weight:bold; border-radius:4px"></select>
+          <button class="tt-print-btn" onclick="printTimetable('classTable')">🖨️ Print Landscape</button>
+          <button class="excel-btn" onclick="exportToCSV('classTable','Class_Timetable')">📥 Export Excel</button>
+        </div>
         <div style="width:100%; overflow-x:auto; margin-top:10px; border:1px solid #eee" id="classTable"></div>
       </div>
 
       <div id="teacherViewTT" style="display:none">
         <div style="font-size:20px; font-weight:bold; margin-bottom:15px; text-transform:uppercase; margin-top:15px; text-align:center; width:100%; display:block" id="teacherLabel">TEACHER TIMETABLE</div>
-        <div class="no-print" style="text-align:center; margin-bottom:15px"><select id="teacherPicker" onchange="renderTeacherView()" style="padding:8px 12px; border:1px solid #ccc; background:#fff; cursor:pointer; font-weight:bold; border-radius:4px"></select></div>
+        <div class="no-print" style="text-align:center; margin-bottom:10px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap">
+          <select id="teacherPicker" onchange="renderTeacherView()" style="padding:8px 12px; border:1px solid #ccc; background:#fff; cursor:pointer; font-weight:bold; border-radius:4px"></select>
+          <button class="tt-print-btn" onclick="printTimetable('teacherTable')">🖨️ Print Landscape</button>
+          <button class="excel-btn" onclick="exportToCSV('teacherTable','Teacher_Timetable')">📥 Export Excel</button>
+        </div>
         <div style="width:100%; overflow-x:auto; margin-top:10px; border:1px solid #eee" id="teacherTable"></div>
       </div>
 
@@ -523,6 +678,7 @@ button,input,textarea,select{font-family:inherit;outline:none}
   <button class="nb on" id="btn-home" onclick="go('home')"><span class="ico">🏠</span>Home</button>
   <button class="nb" id="btn-register" onclick="go('register')"><span class="ico">👥</span>Reg</button>
   <button class="nb" id="btn-assessment" onclick="go('assessment')"><span class="ico">📝</span>Exams</button>
+  <button class="nb" id="btn-analysis" onclick="go('analysis')"><span class="ico">📈</span>Analysis</button>
   <button class="nb" id="btn-finance" onclick="go('finance')"><span class="ico">💰</span>Finance</button>
   <button class="nb" id="btn-attendance" onclick="go('attendance')"><span class="ico">📅</span>Att</button>
   <button class="nb" id="btn-list" onclick="go('list')"><span class="ico">📋</span>List</button>
@@ -596,6 +752,7 @@ function go(id){
   if(id==='finance') renderFinance();
   if(id==='list') renderGradeList();
   if(id==='reports') renderExamPeriodCheckboxes();
+  if(id==='analysis') renderExamAnalysisTab();
   if(id==='attendance') { if(!document.getElementById('attDate').value) document.getElementById('attDate').value = new Date().toISOString().split('T')[0]; renderAttendance(); }
 }
 
@@ -641,7 +798,7 @@ function renderAttendance(){
     });
     
     dailyH += `<tr class="tot-row"><td colspan="2"><b>TOTALS</b></td><td style="text-align:center"><b>P:${pCount} H:${hCount} A:${aCount}</b></td></tr>`;
-    dailyH += `</tbody></table><button class="btn btn-b no-print" style="width:100%; margin-top:12px; margin-bottom:12px" onclick="window.print()">🖨 Print Daily Attendance</button>`;
+    dailyH += `</tbody></table><div style="display:flex; gap:8px; margin-top:12px; margin-bottom:12px"><button class="btn btn-b no-print" style="flex:1" onclick="window.print()">🖨 Print Daily Attendance</button><button class="excel-btn no-print" style="flex:1" onclick="exportToCSV('attendanceUI','Attendance_Daily')">📥 Export Excel</button></div>`;
     
     const allDates = Object.keys(ATTENDANCE).sort();
     let historyH = `<div class="ch" style="margin-top:20px">Attendance Register (Full History)</div><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Adm No</th><th>Learner Name</th>`;
@@ -675,7 +832,7 @@ function renderAttendance(){
     });
     dayTotalsRow += `<td style="font-weight:900; background:#f1f5f9; text-align:center">—</td></tr>`;
     historyH += dayTotalsRow;
-    historyH += `</tbody></table></div><button class="btn btn-go no-print" style="width:100%; margin-top:10px" onclick="window.print()">Print Full Attendance List</button>`;
+    historyH += `</tbody></table></div><div style="display:flex; gap:8px; margin-top:10px"><button class="btn btn-go no-print" style="flex:1" onclick="window.print()">🖨 Print Full Attendance List</button><button class="excel-btn no-print" style="flex:1" onclick="exportToCSV('attendanceUI','Attendance_History')">📥 Export Excel</button></div>`;
     
     let totalPossibleDays = list.length * allDates.length, totalPresentSum = 0;
     allDates.forEach(d => { list.forEach(l => { if(ATTENDANCE[d][l.adm] === 'P') totalPresentSum++; if(ATTENDANCE[d][l.adm] === 'H') totalPresentSum += 0.5; }); });
@@ -739,7 +896,7 @@ function renderGradeList(){
         let bal = totalFee - paid;
         h += `<tr><td><b>${l.adm}</b></td><td><b>${l.name}</b></td><td>${l.assNo || '-'}</td><td>${l.gender || '-'}</td><td>${l.doa || '-'}</td><td>${l.dob || '-'}</td><td>${l.email || '-'}</td><td>${l.parName || '-'}</td><td>${l.parPhone || '-'}</td><td>${l.parEmail || '-'}</td><td style="font-weight:bold; color:${bal>0?'red':'green'}">${bal}</td></tr>`; 
     });
-    h += `</tbody></table></div><button class="btn btn-g no-print" style="width:100%; margin-top:20px" onclick="window.print()">Print Grade List</button></div>`;
+    h += `</tbody></table></div><div style="display:flex; gap:8px; margin-top:20px"><button class="btn btn-g no-print" style="flex:1" onclick="window.print()">🖨 Print Grade List</button><button class="excel-btn no-print" style="flex:1" onclick="exportToCSV('gradeListContent','Learner_List')">📥 Export Excel</button></div></div>`;
     document.getElementById('gradeListContent').innerHTML = h;
 }
 
@@ -747,51 +904,137 @@ function addFeeItem(){ FEE_STRUCTURE.push({name: 'New Fee', amt: 0}); saveAll();
 function remFeeItem(i){ FEE_STRUCTURE.splice(i,1); saveAll(); renderFinance(); }
 function updFeeItem(i, f, v){ FEE_STRUCTURE[i][f] = (f==='amt' ? parseInt(v)||0 : v); saveAll(); renderFinance(); }
 
+function printFeeStructure(){
+    // Populate the print-only table before printing
+    const school = getSchoolName();
+    document.getElementById('feePrintSchool').textContent = school;
+    let tbody = '';
+    FEE_STRUCTURE.forEach((item, i) => {
+        tbody += `<tr><td>${i+1}</td><td>${item.name}</td><td>${item.amt}</td></tr>`;
+    });
+    document.getElementById('feeStructurePrintBody').innerHTML = tbody;
+    document.getElementById('feePrintTotal').textContent = FEE_STRUCTURE.reduce((s,x) => s+x.amt, 0);
+    window.print();
+}
+
 function renderFinance(){
     let h = FEE_STRUCTURE.map((item, i) => `<div style="display:grid; grid-template-columns: 1fr 100px 40px; gap:5px; margin-bottom:5px"><input class="fi" style="margin:0" value="${item.name}" onchange="updFeeItem(${i},'name',this.value)"><input class="fi" type="number" style="margin:0" value="${item.amt}" onchange="updFeeItem(${i},'amt',this.value)"><button class="btn btn-r no-print" style="padding:0; height:35px" onclick="remFeeItem(${i})">✕</button></div>`).join('');
     document.getElementById('feeItemsList').innerHTML = h;
     const totalReq = FEE_STRUCTURE.reduce((s, x) => s + x.amt, 0);
     document.getElementById('totalFeeLabel').textContent = totalReq;
     document.getElementById('payStudent').innerHTML = LEARNERS.map(l => `<option value="${l.adm}">${l.name} (#${l.adm})</option>`).join('');
-    let monHtml = `<table class="tbl"><thead><tr><th>Learner</th><th>Paid</th><th>Bal</th><th>View</th></tr></thead><tbody>`;
+    let monHtml = `<table class="tbl"><thead><tr><th>Learner</th><th>Paid</th><th>Balance</th><th>Actions</th></tr></thead><tbody>`;
     LEARNERS.forEach(l => {
         let paid = (PAYMENTS[l.adm] || []).reduce((s, p) => s + p.amt, 0);
-        monHtml += `<tr><td><b>${l.name}</b></td><td>${paid}</td><td style="color:${(totalReq-paid)>0?'red':'green'}">${totalReq-paid}</td><td><button class="btn btn-b" style="padding:4px 8px; font-size:10px" onclick="generateReceipt('${l.adm}',0,'',true)">View</button></td></tr>`;
+        let bal = totalReq - paid;
+        monHtml += `<tr><td><b>${l.name}</b></td><td>${paid}</td><td style="color:${bal>0?'red':'green'};font-weight:700">${bal}</td><td><button class="btn btn-b" style="padding:4px 8px; font-size:10px" onclick="generateReceipt('${l.adm}',0,'',true)">📄 View / Edit</button></td></tr>`;
     });
     document.getElementById('financeList').innerHTML = monHtml + `</tbody></table>`;
 }
 
-function recordPayment(){
-    const adm = document.getElementById('payStudent').value, amt = parseInt(document.getElementById('payAmt').value), date = document.getElementById('payDate').value;
-    if(!amt || !date) return alert("Missing fields");
-    if(!PAYMENTS[adm]) PAYMENTS[adm] = [];
-    PAYMENTS[adm].push({amt, date});
-    saveAll(); renderFinance(); generateReceipt(adm, amt, date);
+function toggleTxnField(){
+  const mode = document.getElementById('payMode').value;
+  document.getElementById('txnCodeRow').style.display = (mode==='M-Pesa'||mode==='School Account') ? 'block' : 'none';
 }
 
-function generateReceipt(adm, amt, date, viewOnly = false){
-    const l = LEARNERS.find(x => x.adm === adm), totalReq = FEE_STRUCTURE.reduce((s, x) => s + x.amt, 0), history = PAYMENTS[adm] || [], totalPaid = history.reduce((s, p) => s + p.amt, 0);
+function recordPayment(){
+    const adm = document.getElementById('payStudent').value;
+    const amt = parseInt(document.getElementById('payAmt').value);
+    const date = document.getElementById('payDate').value;
+    const mode = document.getElementById('payMode').value;
+    const txn = document.getElementById('payTxnCode').value.trim();
+    if(!amt || !date) return alert("Missing fields: Amount and Date are required.");
+    if((mode==='M-Pesa'||mode==='School Account') && !txn) return alert("Please enter the Transaction Code / Receipt No. for "+mode+" payments.");
+    if(!PAYMENTS[adm]) PAYMENTS[adm] = [];
+    PAYMENTS[adm].push({amt, date, mode, txn});
+    document.getElementById('payAmt').value = '';
+    document.getElementById('payDate').value = '';
+    document.getElementById('payTxnCode').value = '';
+    document.getElementById('payMode').value = 'Cash';
+    toggleTxnField();
+    saveAll(); renderFinance(); generateReceipt(adm, amt, date, false, mode, txn);
+}
+
+function generateReceipt(adm, amt, date, viewOnly=false, mode='', txn=''){
+    const l = LEARNERS.find(x => x.adm === adm);
+    if(!l) return;
+    const totalReq = FEE_STRUCTURE.reduce((s, x) => s + x.amt, 0);
+    const history = PAYMENTS[adm] || [];
+    const totalPaid = history.reduce((s, p) => s + p.amt, 0);
+
     let historyHtml = "";
     if(viewOnly && history.length > 0) {
-        historyHtml = `<div style="margin-top:10px; border-top:1px solid var(--border); padding-top:10px"><div class="ch">Full Payment History</div>`;
-        history.forEach(p => { historyHtml += `<div class="fin-row"><span>${p.date}</span> <b>${p.amt}</b></div>`; });
-        historyHtml += `</div>`;
+        historyHtml = `<div style="margin-top:10px; border-top:1px solid var(--border); padding-top:10px">
+          <div class="ch">Full Payment History</div>
+          <div style="overflow-x:auto">
+          <table class="tbl" id="payHistTable_${adm}">
+            <thead><tr><th>#</th><th>Date</th><th>Amount</th><th>Mode</th><th>Txn/Ref</th><th class="no-print">Actions</th></tr></thead>
+            <tbody>`;
+        history.forEach((p, i) => {
+            historyHtml += `<tr id="phrow_${adm}_${i}">
+              <td>${i+1}</td>
+              <td>${p.date}</td>
+              <td><b>${p.amt}</b></td>
+              <td>${p.mode||'Cash'}</td>
+              <td>${p.txn||'—'}</td>
+              <td class="no-print" style="white-space:nowrap">
+                <button class="btn btn-go" style="padding:3px 7px;font-size:9px" onclick="editPayment('${adm}',${i})">✏️ Edit</button>
+                <button class="btn btn-r" style="padding:3px 7px;font-size:9px;margin-left:3px" onclick="deletePayment('${adm}',${i})">🗑</button>
+              </td>
+            </tr>`;
+        });
+        historyHtml += `</tbody></table></div></div>`;
     } else {
-        historyHtml = `<div style="background:#f1f5f9; padding:8px; margin:10px 0"><div class="fin-row" style="border:none"><span>Amount Paid:</span> <b>${amt}</b></div></div>`;
+        historyHtml = `<div style="background:#f1f5f9; padding:8px; margin:10px 0; border-radius:6px">
+          <div class="fin-row" style="border:none"><span>Amount Paid:</span> <b>${amt}</b></div>
+          <div class="fin-row" style="border:none"><span>Mode:</span> <b>${mode||'Cash'}</b></div>
+          ${txn ? `<div class="fin-row" style="border:none"><span>Txn/Ref:</span> <b>${txn}</b></div>` : ''}
+        </div>`;
     }
+
     document.getElementById('receiptArea').innerHTML = `
         <div class="receipt-box">
-            <div style="text-align:center; border-bottom: 2px solid #000"><h3>${getSchoolName()}</h3><p>OFFICIAL FEE STATEMENT</p></div>
+            <div style="text-align:center; border-bottom:2px solid #000; padding-bottom:6px; margin-bottom:6px">
+              <h3 style="margin:0">${getSchoolName()}</h3>
+              <p style="margin:2px 0; font-weight:bold">OFFICIAL FEE STATEMENT</p>
+            </div>
             <div class="fin-row"><span>Learner:</span> <b>${l.name}</b></div>
             <div class="fin-row"><span>ADM No:</span> <b>${l.adm}</b></div>
             ${!viewOnly ? `<div class="fin-row"><span>Date:</span> <b>${date}</b></div>` : ''}
             ${historyHtml}
             <div class="fin-row"><span>Term Total Required:</span> <b>${totalReq}</b></div>
             <div class="fin-row"><span>Cumulative Paid:</span> <b>${totalPaid}</b></div>
-            <div class="fin-row" style="border-top:1px solid #000; font-weight:bold; font-size:14px; margin-top:5px; padding-top:10px"><span>TOTAL BALANCE DUE:</span> <b style="color:${(totalReq-totalPaid)>0?'red':'green'}">${totalReq-totalPaid}</b></div>
-            <button class="btn btn-g no-print" style="width:100%; margin-top:10px" onclick="window.print()">Print Statement</button>
+            <div class="fin-row" style="border-top:1px solid #000; font-weight:bold; font-size:14px; margin-top:5px; padding-top:10px">
+              <span>TOTAL BALANCE DUE:</span>
+              <b style="color:${(totalReq-totalPaid)>0?'red':'green'}">${totalReq-totalPaid}</b>
+            </div>
+            <div style="display:flex; gap:8px; margin-top:10px" class="no-print">
+              <button class="btn btn-g" style="flex:1" onclick="window.print()">🖨 Print Statement</button>
+              <button class="excel-btn" style="flex:1" onclick="exportToCSV('receiptArea','Payment_Statement')">📥 Export Excel</button>
+            </div>
         </div>`;
     document.getElementById('receiptArea').scrollIntoView({behavior: "smooth"});
+}
+
+function editPayment(adm, idx){
+    const p = PAYMENTS[adm][idx];
+    if(!p) return;
+    const newAmt = prompt("Edit Amount:", p.amt);
+    if(newAmt === null) return;
+    const newDate = prompt("Edit Date (YYYY-MM-DD):", p.date);
+    if(newDate === null) return;
+    const newMode = prompt("Edit Mode (Cash / M-Pesa / School Account):", p.mode||'Cash');
+    if(newMode === null) return;
+    const newTxn = prompt("Edit Transaction Code / Receipt No.:", p.txn||'');
+    if(newTxn === null) return;
+    PAYMENTS[adm][idx] = { amt: parseInt(newAmt)||p.amt, date: newDate||p.date, mode: newMode||p.mode||'Cash', txn: newTxn };
+    saveAll(); renderFinance(); generateReceipt(adm, 0, '', true);
+}
+
+function deletePayment(adm, idx){
+    if(!confirm("Delete this payment record?")) return;
+    PAYMENTS[adm].splice(idx, 1);
+    saveAll(); renderFinance(); generateReceipt(adm, 0, '', true);
 }
 
 function renderExamPeriodDropdown(){
@@ -808,13 +1051,24 @@ function renderExamPeriodDropdown(){
 
 function renderExamConfig(){
   renderExamPeriodDropdown();
-  const exKey = document.getElementById('termSel').value + '_' + document.getElementById('exSel').value, subj = document.getElementById('subjSel').value;
-  if(!EXAM_CONFIGS[exKey]) EXAM_CONFIGS[exKey] = {}; if(!EXAM_CONFIGS[exKey][subj]) EXAM_CONFIGS[exKey][subj] = [];
-  const cfg = EXAM_CONFIGS[exKey][subj];
-  let h = `<div style="margin-top:10px; border-top:1px dashed var(--border); padding-top:10px"><div class="fl">Configure ${subj} Parts</div>`;
-  h += cfg.map((c, i) => `<div style="display:flex; gap:5px; margin-bottom:5px"><input class="fi" style="margin:0; flex:1" value="${c.name}" onchange="updCfg('${exKey}','${subj}',${i},'name',this.value)"><input class="fi" style="margin:0; width:60px" type="number" value="${c.max}" onchange="updCfg('${exKey}','${subj}',${i},'max',this.value)"><button class="btn btn-r" onclick="remCfg('${exKey}','${subj}',${i})">✕</button></div>`).join('');
-  h += `<button class="btn btn-b" style="width:100%; margin-top:5px; padding:6px" onclick="addCfg('${exKey}','${subj}')">+ Add Learning Area</button></div>`;
-  document.getElementById('examConfigUI').innerHTML = h; renderExamEntry();
+  const term = document.getElementById('termSel').value;
+  const exPeriod = document.getElementById('exSel').value;
+  const subj = document.getElementById('subjSel').value;
+  const grade = document.getElementById('exGradeSel')?.value;
+  if(!grade) { document.getElementById('examConfigUI').innerHTML = '<p style="color:var(--sub);font-size:11px;padding:8px 0">↑ Select a Target Grade above to configure task areas per grade.</p>'; return; }
+  const cfgKey = term + '_' + exPeriod + '_g' + grade;
+  if(!EXAM_CONFIGS[cfgKey]) EXAM_CONFIGS[cfgKey] = {};
+  if(!EXAM_CONFIGS[cfgKey][subj]) EXAM_CONFIGS[cfgKey][subj] = [];
+  const cfg = EXAM_CONFIGS[cfgKey][subj];
+  let h = `<div style="margin-top:10px; border-top:1px dashed var(--border); padding-top:10px">
+    <div class="fl" style="color:var(--b)">Configure ${subj} Tasks — Grade ${grade} (${EXAM_PERIODS[exPeriod]?.label||exPeriod})</div>`;
+  h += cfg.map((c, i) => `<div style="display:flex; gap:5px; margin-bottom:5px">
+    <input class="fi" style="margin:0; flex:1" value="${c.name}" onchange="updCfg('${cfgKey}','${subj}',${i},'name',this.value)">
+    <input class="fi" style="margin:0; width:60px" type="number" value="${c.max}" onchange="updCfg('${cfgKey}','${subj}',${i},'max',this.value)">
+    <button class="btn btn-r" onclick="remCfg('${cfgKey}','${subj}',${i})">✕</button></div>`).join('');
+  h += `<button class="btn btn-b" style="width:100%; margin-top:5px; padding:6px" onclick="addCfg('${cfgKey}','${subj}')">+ Add Task Area</button></div>`;
+  document.getElementById('examConfigUI').innerHTML = h;
+  renderExamEntry();
 }
 
 function addCfg(exKey, subj){ EXAM_CONFIGS[exKey][subj].push({name:"Task 1", max:50}); saveAll(); renderExamConfig(); }
@@ -823,60 +1077,85 @@ function updCfg(exKey, subj, i, f, v){ EXAM_CONFIGS[exKey][subj][i][f] = (f==='m
 
 function renderExamEntry(){
   const term = document.getElementById('termSel').value, ex = document.getElementById('exSel').value, subj = document.getElementById('subjSel').value;
-  const exKey = term + '_' + ex, cfg = EXAM_CONFIGS[exKey][subj] || [];
+  const exKey = term + '_' + ex; // SUMMATIVE score storage key (unchanged)
   const printBtn = document.getElementById('printMarkBtn');
+  const exportBtn = document.getElementById('exportMarkBtn');
   const grade = document.getElementById('exGradeSel')?.value;
   const sortBy = document.getElementById('exSort')?.value || 'alpha';
-  
-  if(!grade) { document.getElementById('examEntryUI').innerHTML = "<p style='padding:20px; text-align:center; color:var(--sub)'>Please select a Target Grade above.</p>"; printBtn.style.display = "none"; return; }
-  if(!cfg.length) { document.getElementById('examEntryUI').innerHTML = "<p style='padding:20px; text-align:center; color:var(--sub)'>Define areas above.</p>"; printBtn.style.display = "none"; return; }
-  
-  printBtn.style.display = "block";
+  const cfgKey = exKey + '_g' + grade; // grade-specific task config key
+
+  if(!grade) { document.getElementById('examEntryUI').innerHTML = "<p style='padding:20px; text-align:center; color:var(--sub)'>Please select a Target Grade above.</p>"; printBtn.style.display = "none"; if(exportBtn) exportBtn.style.display="none"; return; }
+  if(!EXAM_CONFIGS[cfgKey]) EXAM_CONFIGS[cfgKey] = {};
+  if(!EXAM_CONFIGS[cfgKey][subj]) EXAM_CONFIGS[cfgKey][subj] = [];
+  const cfg = EXAM_CONFIGS[cfgKey][subj];
+
+  if(!cfg.length) { document.getElementById('examEntryUI').innerHTML = "<p style='padding:20px; text-align:center; color:var(--sub)'>Define task areas above for Grade "+grade+".</p>"; printBtn.style.display = "none"; if(exportBtn) exportBtn.style.display="none"; return; }
+
+  printBtn.style.display = "block"; if(exportBtn) exportBtn.style.display="block";
   let maxTotal = cfg.reduce((sum, c) => sum + (parseInt(c.max) || 0), 0);
   let filteredLearners = LEARNERS.filter(l => l.grade === grade);
 
   if(sortBy === 'alpha') filteredLearners.sort((a,b) => a.name.localeCompare(b.name));
-  else if (sortBy === 'marks') filteredLearners.sort((a,b) => { let sumA = cfg.reduce((s,c) => s + (SUMMATIVE[a.adm+"_"+exKey]?.[subj]?.[c.name]?.raw || 0), 0); let sumB = cfg.reduce((s,c) => s + (SUMMATIVE[b.adm+"_"+exKey]?.[subj]?.[c.name]?.raw || 0), 0); return sumB - sumA; });
+  else if(sortBy === 'marks') filteredLearners.sort((a,b) => {
+    let sumA = cfg.reduce((s,c) => s + (SUMMATIVE[a.adm+"_"+exKey]?.[subj]?.[c.name]?.raw || 0), 0);
+    let sumB = cfg.reduce((s,c) => s + (SUMMATIVE[b.adm+"_"+exKey]?.[subj]?.[c.name]?.raw || 0), 0);
+    return sumB - sumA;
+  });
+
+  const termLabel = term==='t1'?'TERM 1':term==='t2'?'TERM 2':'TERM 3';
+  const epLabel = EXAM_PERIODS[ex]?.label || ex.toUpperCase();
 
   let h = `<div id="printableMarkSheet">
     <div class="only-print" style="text-align:center; margin-bottom:15px">
-        <h2 style="color:var(--nav); margin:0">${getSchoolName()}</h2>
-        <p style="font-weight:bold; margin:2px 0">${term.toUpperCase().replace('T','TERM ')} - ${ex.toUpperCase()} MARK SHEET</p>
-        <p style="font-weight:bold; color:var(--b)">GRADE ${grade} | SUBJECT: ${subj}</p>
+      <h2 style="margin:0">${getSchoolName()}</h2>
+      <p style="font-weight:bold; margin:2px 0">${termLabel} — ${epLabel} MARK SHEET</p>
+      <p style="font-weight:bold">GRADE ${grade} | SUBJECT: ${subj}</p>
     </div>
-    <table class="tbl"><thead><tr><th>Name</th>`; 
-  cfg.forEach(c => h += `<th>${c.name}</th>`); 
+    <table class="tbl"><thead><tr><th>Name</th>`;
+  cfg.forEach(c => h += `<th>${c.name}<br><small style="font-weight:normal;font-size:8px">Max: ${c.max}</small></th>`);
   h += `<th>%</th><th>PTS</th><th>LVL</th></tr></thead><tbody>`;
-  
-  if(filteredLearners.length === 0) h += `<tr><td colspan="${cfg.length + 4}" style="text-align:center; padding:10px">No learners in Grade ${grade}</td></tr>`;
-  else {
-      let totalTaskMarks = [], totalPoints = [], totalLevels = [];
-      filteredLearners.forEach(l => {
-        let key = l.adm+"_"+exKey; if(!SUMMATIVE[key]) SUMMATIVE[key] = {}; if(!SUMMATIVE[key][subj]) SUMMATIVE[key][subj] = {};
-        let rowSum = 0; h += `<tr><td style="font-weight:700">${l.name}</td>`;
-        cfg.forEach(c => {
-          let score = SUMMATIVE[key][subj][c.name] ? SUMMATIVE[key][subj][c.name].raw : ""; rowSum += (parseInt(score) || 0);
-          h += `<td><input type="number" class="fi" style="width:35px; margin:0; padding:4px" value="${score}" onchange="saveScore('${l.adm}','${exKey}','${subj}','${c.name}',this.value,${c.max})"></td>`;
-        });
-        
-        let pct = maxTotal > 0 ? Math.round((rowSum / maxTotal) * 100) : 0;
-        let errorMsg = pct > 100 ? ' ⚠️ Recheck Tasks Out ofs!' : '';
-        h += `<td style="font-weight:900; color:${pct>100?'var(--r)':'var(--b)'}; background:${pct>100?'var(--rl)':'transparent'}">${pct}%${errorMsg}</td>`;
-        
-        let lvl = getCbeLvl(pct), pts = getCbePts(lvl);
-        totalTaskMarks.push(rowSum); totalPoints.push(pts); totalLevels.push(lvl);
-        h += `<td style="font-weight:900">${pts}</td><td><span class="badge b-${lvl.toLowerCase()}">${lvl}</span></td></tr>`;
+
+  if(filteredLearners.length === 0) {
+    h += `<tr><td colspan="${cfg.length+4}" style="text-align:center;padding:10px">No learners in Grade ${grade}</td></tr>`;
+  } else {
+    let totalTaskMarks = [], totalPoints = [], totalLevels = [];
+    let taskColSums = cfg.map(() => 0);
+
+    filteredLearners.forEach(l => {
+      let key = l.adm+"_"+exKey;
+      if(!SUMMATIVE[key]) SUMMATIVE[key] = {};
+      if(!SUMMATIVE[key][subj]) SUMMATIVE[key][subj] = {};
+      let rowSum = 0;
+      h += `<tr><td style="font-weight:700">${l.name}</td>`;
+      cfg.forEach((c, ci) => {
+        let score = SUMMATIVE[key][subj][c.name] !== undefined ? SUMMATIVE[key][subj][c.name].raw : '';
+        rowSum += (parseInt(score) || 0);
+        taskColSums[ci] += (parseInt(score) || 0);
+        h += `<td style="text-align:center">
+          <input type="number" class="fi" style="width:38px;margin:0;padding:3px;text-align:center" value="${score}" onchange="saveScore('${l.adm}','${exKey}','${subj}','${c.name}',this.value,${c.max})">
+          <span class="exam-score-pv">${score !== '' ? score : '—'}</span>
+        </td>`;
       });
-      
-      if(filteredLearners.length > 0) {
-        let avgTaskMarks = Math.round(totalTaskMarks.reduce((a,b) => a+b, 0) / totalTaskMarks.length);
-        let avgPoints = Math.round(totalPoints.reduce((a,b) => a+b, 0) / totalPoints.length);
-        let mostFrequentLevel = getMostFrequent(totalLevels);
-        let avgPct = maxTotal > 0 ? Math.round((avgTaskMarks / maxTotal) * 100) : 0;
-        h += `<tr class="tot-row"><td><b>Mean Score</b></td>`;
-        for(let i = 0; i < cfg.length; i++) h += `<td style="font-weight:900; text-align:center">—</td>`;
-        h += `<td style="font-weight:900; color:var(--g)">${avgPct}%</td><td style="font-weight:900">${avgPoints}</td><td><span class="badge b-${mostFrequentLevel.toLowerCase()}">${mostFrequentLevel}</span></td></tr>`;
-      }
+      let pct = maxTotal > 0 ? Math.round((rowSum / maxTotal) * 100) : 0;
+      let errorMsg = pct > 100 ? ' ⚠️' : '';
+      h += `<td style="font-weight:900;color:${pct>100?'var(--r)':'var(--b)'};background:${pct>100?'var(--rl)':'transparent'}">${pct}%${errorMsg}</td>`;
+      let lvl = getCbeLvl(pct), pts = getCbePts(lvl);
+      totalTaskMarks.push(rowSum); totalPoints.push(pts); totalLevels.push(lvl);
+      h += `<td style="font-weight:900">${pts}</td><td><span class="badge b-${lvl.toLowerCase()}">${lvl}</span></td></tr>`;
+    });
+
+    if(filteredLearners.length > 0) {
+      let avgTaskMarks = Math.round(totalTaskMarks.reduce((a,b) => a+b, 0) / totalTaskMarks.length);
+      let avgPoints = Math.round(totalPoints.reduce((a,b) => a+b, 0) / totalPoints.length);
+      let mostFrequentLevel = getMostFrequent(totalLevels);
+      let avgPct = maxTotal > 0 ? Math.round((avgTaskMarks / maxTotal) * 100) : 0;
+      h += `<tr class="tot-row"><td><b>Mean Score</b></td>`;
+      taskColSums.forEach((sum) => {
+        let colMean = filteredLearners.length > 0 ? Math.round(sum / filteredLearners.length) : 0;
+        h += `<td style="font-weight:900;text-align:center">${colMean}</td>`;
+      });
+      h += `<td style="font-weight:900;color:var(--g)">${avgPct}%</td><td style="font-weight:900">${avgPoints}</td><td><span class="badge b-${mostFrequentLevel.toLowerCase()}">${mostFrequentLevel}</span></td></tr>`;
+    }
   }
   document.getElementById('examEntryUI').innerHTML = h + `</tbody></table></div>`;
 }
@@ -896,6 +1175,20 @@ function addNewExamPeriod(){
   while(EXAM_PERIODS[newKey]) newKey = 'op' + (Math.floor(Math.random() * 100000));
   EXAM_PERIODS[newKey] = { key: newKey, label: newPeriodName }; saveExamPeriods();
   renderExamPeriodDropdown(); document.getElementById('exSel').value = newKey; renderExamConfig(); renderExamPeriodCheckboxes(); renderRepExamPeriodDropdown();
+  anaPopulateExamPeriods('anaExamSel_A'); anaPopulateExamPeriods('anaExamSel_B');
+}
+
+function removeExamPeriod(){
+  const exSel = document.getElementById('exSel'), key = exSel.value;
+  if(!key || !EXAM_PERIODS[key]) return alert("No exam period selected.");
+  const label = EXAM_PERIODS[key].label;
+  if(!confirm(`Delete exam period "${label}"?\n\nThis will remove task configurations for this period. Learner scores are NOT deleted.`)) return;
+  delete EXAM_PERIODS[key];
+  // Remove grade-specific configs for this period
+  Object.keys(EXAM_CONFIGS).forEach(k => { if(k.includes('_'+key+'_g') || k.endsWith('_'+key)) delete EXAM_CONFIGS[k]; });
+  saveExamPeriods(); saveAll();
+  renderExamPeriodDropdown(); renderExamConfig(); renderExamPeriodCheckboxes(); renderRepExamPeriodDropdown();
+  anaPopulateExamPeriods('anaExamSel_A'); anaPopulateExamPeriods('anaExamSel_B');
 }
 
 function renderExamPeriodCheckboxes(){
@@ -942,7 +1235,10 @@ function generateGradeSheet(){
     let rowPercentages = [], rowPoints = [], rowLevels = [];
     html += `<tr><td>${l.adm}</td><td style="font-weight:700; text-align:left">${l.name}</td>`;
     subjs.forEach(s => {
-      const fullKey = term + '_' + examPeriod, data = SUMMATIVE[l.adm+"_"+fullKey] && SUMMATIVE[l.adm+"_"+fullKey][s], areas = EXAM_CONFIGS[fullKey] && EXAM_CONFIGS[fullKey][s] ? EXAM_CONFIGS[fullKey][s] : [];
+      const sumKey = term + '_' + examPeriod;
+      const cfgKey = sumKey + '_g' + grade;
+      const data = SUMMATIVE[l.adm+"_"+sumKey] && SUMMATIVE[l.adm+"_"+sumKey][s];
+      const areas = EXAM_CONFIGS[cfgKey] && EXAM_CONFIGS[cfgKey][s] ? EXAM_CONFIGS[cfgKey][s] : [];
       let subjPct = 0, subjPts = 0, subjLvl = '—';
       if(data && areas.length) { let sum = 0, max = 0; areas.forEach(a => { sum += (data[a.name]?.raw || 0); max += a.max; }); subjPct = max > 0 ? Math.round((sum/max)*100) : 0; subjLvl = getCbeLvl(subjPct); subjPts = getCbePts(subjLvl); }
       rowPercentages.push(subjPct); rowPoints.push(subjPts); rowLevels.push(subjLvl);
@@ -959,7 +1255,7 @@ function generateGradeSheet(){
     for(let i = 0; i < subjs.length; i++) html += `<td style="text-align:center">—</td><td style="text-align:center">—</td><td style="text-align:center">—</td>`;
     html += `<td style="font-weight:900; background:#dbeafe; text-align:center">${meanPct}%</td><td style="font-weight:900; background:#dbeafe; text-align:center">${meanPts}</td><td style="background:#dbeafe; text-align:center"><span class="badge b-${meanLvl.toLowerCase()}">${meanLvl}</span></td></tr>`;
   }
-  html += `</tbody></table></div><button class="btn btn-g no-print" style="width:100%; margin-top:15px" onclick="window.print()">📋 Print Grade Marks Sheet</button>`;
+  html += `</tbody></table></div><div style="display:flex; gap:8px; margin-top:15px"><button class="btn btn-g no-print" style="flex:1" onclick="window.print()">📋 Print Grade Marks Sheet</button><button class="excel-btn no-print" style="flex:1" onclick="exportToCSV('reportContent','Grade_${grade}_Marks_Sheet')">📥 Export Excel</button></div>`;
   document.getElementById('reportContent').innerHTML = `<div class="card"><div style="text-align:center; margin-bottom:15px"><h3 style="color:var(--nav); margin:0">${getSchoolName()}</h3><p style="font-size:11px; font-weight:800; color:var(--sub)">GRADE ${grade} MARKS SHEET - ${term === 't1' ? 'TERM 1' : term === 't2' ? 'TERM 2' : 'TERM 3'} | ${examLabel}</p></div>${html}</div>`;
 }
 
@@ -989,7 +1285,10 @@ function generateReport(adm){
   let rows = subjs.map(s => {
     let examPcts = [];
     let cells = selectedPeriods.map((exSuffix) => {
-      let exKey = term + '_' + exSuffix, data = SUMMATIVE[adm+"_"+exKey] && SUMMATIVE[adm+"_"+exKey][s], areas = EXAM_CONFIGS[exKey] && EXAM_CONFIGS[exKey][s] ? EXAM_CONFIGS[exKey][s] : [];
+      let exKey = term + '_' + exSuffix;
+      let cfgKey = exKey + '_g' + (l.grade || '7');
+      let data = SUMMATIVE[adm+"_"+exKey] && SUMMATIVE[adm+"_"+exKey][s];
+      let areas = EXAM_CONFIGS[cfgKey] && EXAM_CONFIGS[cfgKey][s] ? EXAM_CONFIGS[cfgKey][s] : [];
       if(!data || !areas.length) return `<td colspan="2">—</td>`;
       let sum = 0, max = 0; areas.forEach(a => { sum += (data[a.name]?.raw || 0); max += a.max; });
       let pct = Math.round((sum/max)*100); examPcts.push(pct);
@@ -1013,7 +1312,7 @@ function generateReport(adm){
   selectedPeriods.forEach(p => { tableHeader += `<th>%</th><th>Lvl</th>`; });
   tableHeader += `<th style="background:#dbeafe">AVG</th><th style="background:#dbeafe">PTS</th><th style="background:#dbeafe">LVL</th></tr>`;
   
-  document.getElementById('reportContent').innerHTML = `<div class="card"><div style="text-align:center; margin-bottom:10px"><h3 style="color:var(--nav); margin:0">${getSchoolName()}</h3><p style="font-size:10px; font-weight:800; color:var(--sub)">OFFICIAL LEARNER'S PROGRESS REPORT - ${termLabel}</p></div><div style="font-size:11px; background:var(--bg); padding:8px; border-radius:8px; display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-bottom:10px"><div><b>NAME:</b> ${l.name}</div><div><b>ADM:</b> ${l.adm}</div><div><b>GRADE:</b> ${l.grade}</div><div><b>ASSESS #:</b> ${l.assNo || 'N/A'}</div></div><div style="overflow-x:auto"><table class="tbl"><thead>${tableHeader}</thead><tbody>${rows}${totalRowHtml}</tbody></table></div><div style="margin-top:15px; font-size:11px"><div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:12px"><div><label class="fl">Closing Date</label><b>${CALENDAR.close || '..........'}</b></div><div><label class="fl">Opening Date</label><b>${CALENDAR.open || '..........'}</b></div></div><div style="border-top:1px solid var(--border); padding-top:10px; margin-bottom:15px"><label class="fl">Class Teacher's Comment</label><textarea class="fta" onchange="saveRemark('${l.adm}', '${term}_ct_rem', this.value)">${rem[`${term}_ct_rem`] || ''}</textarea><div class="rep-grid"><div><label class="fl">Teacher Name</label><input class="fi" value="${rem[`${term}_ct_name`] || ''}" onchange="saveRemark('${l.adm}', '${term}_ct_name', this.value)"></div><div><label class="fl">Signature</label><input class="fi" placeholder="Digital Sign" value="${rem[`${term}_ct_sig`] || ''}" onchange="saveRemark('${l.adm}', '${term}_ct_sig', this.value)"></div><div><label class="fl">Date</label><input type="date" class="fi" value="${rem[`${term}_ct_date`] || ''}" onchange="saveRemark('${l.adm}', '${term}_ct_date', this.value)"></div></div></div><div style="border-top:1px solid var(--border); padding-top:10px; margin-bottom:15px"><label class="fl">Head of Institution's Comment</label><textarea class="fta" onchange="saveRemark('${l.adm}', '${term}_ht_rem', this.value)">${rem[`${term}_ht_rem`] || ''}</textarea><div style="display:flex; gap:10px; align-items:flex-start"><div style="flex:1" class="rep-grid"><div><label class="fl">Headteacher Name</label><input class="fi" value="${rem[`${term}_ht_name`] || ''}" onchange="saveRemark('${l.adm}', '${term}_ht_name', this.value)"></div><div><label class="fl">Signature/Stamp</label><input class="fi" placeholder="Digital Sign" value="${rem[`${term}_ht_sig`] || ''}" onchange="saveRemark('${l.adm}', '${term}_ht_sig', this.value)"></div><div><label class="fl">Date</label><input type="date" class="fi" value="${rem[`${term}_ht_date`] || ''}" onchange="saveRemark('${l.adm}', '${term}_ht_date', this.value)"></div></div><div class="stamp-area">OFFICIAL<br/>SCHOOL<br/>STAMP</div></div></div><div style="border-top:1px solid var(--border); padding-top:10px\"><label class="fl">Parent/Guardian Comment</label><textarea class="fta" onchange="saveRemark('${l.adm}', '${term}_p_rem', this.value)">${rem[`${term}_p_rem`] || ''}</textarea><div class="rep-grid"><div><label class="fl">Parent Name</label><input class="fi" value="${rem[`${term}_p_name`] || ''}" onchange="saveRemark('${l.adm}', '${term}_p_name', this.value)"></div><div><label class="fl">Signature</label><input class="fi" placeholder="Digital Sign" value="${rem[`${term}_p_sig`] || ''}" onchange="saveRemark('${l.adm}', '${term}_p_sig', this.value)"></div><div><label class="fl">Date</label><input type="date" class="fi" value="${rem[`${term}_p_date`] || ''}" onchange="saveRemark('${l.adm}', '${term}_p_date', this.value)"></div></div></div></div><button class="btn btn-g no-print" style="width:100%; margin-top:20px" onclick="window.print()">Print Official Report</button></div>`;
+  document.getElementById('reportContent').innerHTML = `<div class="card"><div style="text-align:center; margin-bottom:10px"><h3 style="color:var(--nav); margin:0">${getSchoolName()}</h3><p style="font-size:10px; font-weight:800; color:var(--sub)">OFFICIAL LEARNER'S PROGRESS REPORT - ${termLabel}</p></div><div style="font-size:11px; background:var(--bg); padding:8px; border-radius:8px; display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-bottom:10px"><div><b>NAME:</b> ${l.name}</div><div><b>ADM:</b> ${l.adm}</div><div><b>GRADE:</b> ${l.grade}</div><div><b>ASSESS #:</b> ${l.assNo || 'N/A'}</div></div><div style="overflow-x:auto"><table class="tbl"><thead>${tableHeader}</thead><tbody>${rows}${totalRowHtml}</tbody></table></div><div style="margin-top:15px; font-size:11px"><div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:12px"><div><label class="fl">Closing Date</label><b>${CALENDAR.close || '..........'}</b></div><div><label class="fl">Opening Date</label><b>${CALENDAR.open || '..........'}</b></div></div><div style="border-top:1px solid var(--border); padding-top:10px; margin-bottom:15px"><label class="fl">Class Teacher's Comment</label><textarea class="fta" onchange="saveRemark('${l.adm}', '${term}_ct_rem', this.value)">${rem[`${term}_ct_rem`] || ''}</textarea><div class="rep-grid"><div><label class="fl">Teacher Name</label><input class="fi" value="${rem[`${term}_ct_name`] || ''}" onchange="saveRemark('${l.adm}', '${term}_ct_name', this.value)"></div><div><label class="fl">Signature</label><input class="fi" placeholder="Digital Sign" value="${rem[`${term}_ct_sig`] || ''}" onchange="saveRemark('${l.adm}', '${term}_ct_sig', this.value)"></div><div><label class="fl">Date</label><input type="date" class="fi" value="${rem[`${term}_ct_date`] || ''}" onchange="saveRemark('${l.adm}', '${term}_ct_date', this.value)"></div></div></div><div style="border-top:1px solid var(--border); padding-top:10px; margin-bottom:15px"><label class="fl">Head of Institution's Comment</label><textarea class="fta" onchange="saveRemark('${l.adm}', '${term}_ht_rem', this.value)">${rem[`${term}_ht_rem`] || ''}</textarea><div style="display:flex; gap:10px; align-items:flex-start"><div style="flex:1" class="rep-grid"><div><label class="fl">Headteacher Name</label><input class="fi" value="${rem[`${term}_ht_name`] || ''}" onchange="saveRemark('${l.adm}', '${term}_ht_name', this.value)"></div><div><label class="fl">Signature/Stamp</label><input class="fi" placeholder="Digital Sign" value="${rem[`${term}_ht_sig`] || ''}" onchange="saveRemark('${l.adm}', '${term}_ht_sig', this.value)"></div><div><label class="fl">Date</label><input type="date" class="fi" value="${rem[`${term}_ht_date`] || ''}" onchange="saveRemark('${l.adm}', '${term}_ht_date', this.value)"></div></div><div class="stamp-area">OFFICIAL<br/>SCHOOL<br/>STAMP</div></div></div><div style="border-top:1px solid var(--border); padding-top:10px\"><label class="fl">Parent/Guardian Comment</label><textarea class="fta" onchange="saveRemark('${l.adm}', '${term}_p_rem', this.value)">${rem[`${term}_p_rem`] || ''}</textarea><div class="rep-grid"><div><label class="fl">Parent Name</label><input class="fi" value="${rem[`${term}_p_name`] || ''}" onchange="saveRemark('${l.adm}', '${term}_p_name', this.value)"></div><div><label class="fl">Signature</label><input class="fi" placeholder="Digital Sign" value="${rem[`${term}_p_sig`] || ''}" onchange="saveRemark('${l.adm}', '${term}_p_sig', this.value)"></div><div><label class="fl">Date</label><input type="date" class="fi" value="${rem[`${term}_p_date`] || ''}" onchange="saveRemark('${l.adm}', '${term}_p_date', this.value)"></div></div></div></div><button class="btn btn-g no-print" style="width:100%; margin-top:20px" onclick="window.print()">🖨 Print Official Report</button><button class="excel-btn no-print" style="width:100%; margin-top:8px" onclick="exportToCSV('reportContent','Learner_Report')">📥 Export Excel</button></div>`;
 }
 
 function saveSchoolName(){
@@ -1407,6 +1706,584 @@ function toggleManualMode() {
   document.getElementById('manualToggle').style.background = ttIsManualMode ? '#10b981' : '#f59e0b';
   document.getElementById('manualToggle').textContent = ttIsManualMode ? '✓ Manual Mode On' : 'Enable Manual Edit';
   renderTimetableMaster();
+}
+
+// ============================================================
+// EXAM ANALYSIS MODULE
+// ============================================================
+
+const ANA_SUBJS = ["ENGLISH","KISWAHILI","MATHEMATICS","INTEGRATED SCIENCE","SOCIAL STUDIES","CREATIVE ARTS","PRE-TECHNICAL","AGRICULTURE","RELIGIOUS EDUCATION"];
+const ANA_SUBJS_SHORT = ["ENG","KIS","MATH","I.SC","SOC","C.ART","PRE-T","AGRI","R.ED"];
+let anaCharts = []; // Track Chart.js instances for cleanup
+
+function renderExamAnalysisTab() {
+  anaPopulateExamPeriods('anaExamSel_A');
+  anaPopulateExamPeriods('anaExamSel_B');
+  switchAnaSection('A');
+}
+
+function anaPopulateExamPeriods(selId) {
+  const sel = document.getElementById(selId); if(!sel) return;
+  const cur = sel.value;
+  let html = '<option value="">-- Select Exam Period --</option>';
+  Object.keys(EXAM_PERIODS).forEach(k => { html += `<option value="${k}">${EXAM_PERIODS[k].label}</option>`; });
+  sel.innerHTML = html;
+  if(cur && EXAM_PERIODS[cur]) sel.value = cur;
+}
+
+function switchAnaSection(s) {
+  ['A','B','C'].forEach(x => {
+    document.getElementById('anaSection_'+x).style.display = x===s ? 'block' : 'none';
+    document.getElementById('anaBtn'+x).classList.toggle('active', x===s);
+  });
+}
+
+// ---- Core data helper ----
+function anaGetLearnerData(adm, term, epKey) {
+  const fullKey = term + '_' + epKey;
+  const learnerGrade = (LEARNERS.find(l => l.adm === adm))?.grade || '7';
+  const cfgKey = fullKey + '_g' + learnerGrade;
+  let subs = {}, pcts = [], pts = [], lvls = [];
+  ANA_SUBJS.forEach(s => {
+    const data = SUMMATIVE[adm+"_"+fullKey] && SUMMATIVE[adm+"_"+fullKey][s];
+    const areas = EXAM_CONFIGS[cfgKey] && EXAM_CONFIGS[cfgKey][s] ? EXAM_CONFIGS[cfgKey][s] : [];
+    if(data && areas.length) {
+      let sum = 0, max = 0;
+      areas.forEach(a => { sum += (data[a.name]?.raw || 0); max += a.max; });
+      const pct = max > 0 ? Math.round((sum/max)*100) : 0;
+      const lvl = getCbeLvl(pct); const pt = getCbePts(lvl);
+      subs[s] = {pct, lvl, pts: pt}; pcts.push(pct); pts.push(pt); lvls.push(lvl);
+    } else { subs[s] = {pct:0, lvl:'—', pts:0}; }
+  });
+  const totalPct = pcts.length>0 ? Math.round(pcts.reduce((a,b)=>a+b,0)/pcts.length) : 0;
+  const totalPts = pts.length>0 ? Math.round(pts.reduce((a,b)=>a+b,0)/pts.length) : 0;
+  const totalLvl = pcts.length>0 ? getCbeLvl(totalPct) : '—';
+  return {subs, totalPct, totalPts, totalLvl, hasData: pcts.length>0};
+}
+
+function anaBadge(lvl) { return `<span class="badge b-${(lvl||'be2').toLowerCase()}">${lvl||'—'}</span>`; }
+
+function anaLevelDesc(lvl) {
+  const m={'EE1':'Exceeds Expectations I','EE2':'Exceeds Expectations II','ME1':'Meets Expectations I','ME2':'Meets Expectations II','AE1':'Approaching Expectations I','AE2':'Approaching Expectations II','BE1':'Below Expectations I','BE2':'Below Expectations II'};
+  return m[lvl]||lvl||'—';
+}
+
+function anaDevColor(dev) { return dev>0?'ana-dev-pos':dev<0?'ana-dev-neg':'ana-dev-neu'; }
+function anaDevArrow(dev) { return dev>0?'▲':dev<0?'▼':'→'; }
+function anaDevStr(dev) { return (dev>0?'+':'')+dev+'%'; }
+
+// ---- Build section HTML helpers ----
+function buildOverallPerfTable(learnerDataArr) {
+  const sorted = [...learnerDataArr].sort((a,b)=>b.examData.totalPct-a.examData.totalPct);
+  let h = `<table class="tbl"><thead><tr><th>Pos</th><th>Learner</th><th>Marks(%)</th><th>Points</th><th>Level</th></tr></thead><tbody>`;
+  sorted.forEach((ld,i)=>{
+    const d=ld.examData;
+    h+=`<tr><td><b>${i+1}</b></td><td>${ld.name}</td><td><b>${d.totalPct}%</b></td><td><b>${d.totalPts}</b></td><td>${anaBadge(d.totalLvl)} ${d.totalLvl}</td></tr>`;
+  });
+  return h+`</tbody></table>`;
+}
+
+function buildLevelDistTable(learnerDataArr) {
+  const lvlCounts={};
+  learnerDataArr.forEach(ld=>{ const lv=ld.examData.totalLvl; lvlCounts[lv]=(lvlCounts[lv]||0)+1; });
+  const lvlSorted=Object.entries(lvlCounts).sort((a,b)=>b[1]-a[1]);
+  let h=`<table class="tbl"><thead><tr><th>Pos</th><th>Level</th><th>Description</th><th>No. of Learners</th></tr></thead><tbody>`;
+  lvlSorted.forEach(([lv,cnt],i)=>{
+    h+=`<tr><td><b>${i+1}</b></td><td>${anaBadge(lv)} <b>${lv}</b></td><td>${anaLevelDesc(lv)}</td><td><b>${cnt}</b></td></tr>`;
+  });
+  return h+`</tbody></table>`;
+}
+
+function buildSubjCompTable(learnerDataArr) {
+  const comp = ANA_SUBJS.map(s=>{
+    const pcts = learnerDataArr.map(ld=>ld.examData.subs[s].pct);
+    const mean = pcts.length>0 ? Math.round(pcts.reduce((a,b)=>a+b,0)/pcts.length) : 0;
+    const lvl = getCbeLvl(mean); const avgPts = getCbePts(lvl);
+    return {s,mean,lvl,avgPts};
+  }).sort((a,b)=>b.mean-a.mean);
+  let h=`<table class="tbl"><thead><tr><th>Pos</th><th>Subject</th><th>Meanscore(%)</th><th>Avg Points</th><th>Level</th></tr></thead><tbody>`;
+  comp.forEach((item,i)=>{
+    h+=`<tr><td><b>${i+1}</b></td><td>${item.s}</td><td><b>${item.mean}%</b></td><td><b>${item.avgPts}</b></td><td>${anaBadge(item.lvl)} ${item.lvl}</td></tr>`;
+  });
+  return h+`</tbody></table>`;
+}
+
+function buildPerSubjTables(learnerDataArr) {
+  let html='';
+  ANA_SUBJS.forEach(s=>{
+    const subjSorted=[...learnerDataArr].sort((a,b)=>b.examData.subs[s].pct-a.examData.subs[s].pct);
+    let opT=`<table class="tbl" style="font-size:9px"><thead><tr><th>Pos</th><th>Learner</th><th>Marks(%)</th><th>Pts</th></tr></thead><tbody>`;
+    subjSorted.forEach((ld,i)=>{
+      const sd=ld.examData.subs[s];
+      opT+=`<tr><td>${i+1}</td><td>${ld.name}</td><td>${sd.pct}%</td><td>${sd.pts}</td></tr>`;
+    });
+    opT+=`</tbody></table>`;
+    const lCts={};
+    learnerDataArr.forEach(ld=>{ const lv=ld.examData.subs[s].lvl; if(lv!=='—') lCts[lv]=(lCts[lv]||0)+1; });
+    const lSorted=Object.entries(lCts).sort((a,b)=>b[1]-a[1]);
+    let lvT=`<table class="tbl" style="font-size:9px"><thead><tr><th>Level</th><th>No. of Learners</th></tr></thead><tbody>`;
+    lSorted.forEach(([lv,cnt])=>{ lvT+=`<tr><td>${anaBadge(lv)} ${lv}</td><td><b>${cnt}</b></td></tr>`; });
+    lvT+=`</tbody></table>`;
+    html+=`<div class="ana-subj-block"><div class="ana-subj-name">${s}</div><div class="ana-grid2">${opT}${lvT}</div></div>`;
+  });
+  return html;
+}
+
+function buildDeviationSection(devDataArr, devLabel, epLabel, gradeLabel) {
+  // i. Individual deviation
+  const indSorted=[...devDataArr].sort((a,b)=>(b.currData.totalPct-b.prevData.totalPct)-(a.currData.totalPct-a.prevData.totalPct));
+  let iT=`<table class="tbl"><thead><tr><th>Pos</th><th>Learner</th><th>Prev (${devLabel})</th><th>Current (${epLabel})</th><th>Level</th><th>Deviation</th></tr></thead><tbody>`;
+  indSorted.forEach((ld,i)=>{
+    const dev=ld.currData.totalPct-ld.prevData.totalPct;
+    iT+=`<tr><td>${i+1}</td><td>${ld.name}</td><td>${ld.prevData.totalPct}%</td><td>${ld.currData.totalPct}%</td><td>${anaBadge(ld.currData.totalLvl)}</td><td class="${anaDevColor(dev)}"><b>${anaDevArrow(dev)} ${anaDevStr(dev)}</b></td></tr>`;
+  });
+  iT+=`</tbody></table>`;
+  // ii. Class deviation
+  const prevMean=Math.round(devDataArr.map(ld=>ld.prevData.totalPct).reduce((a,b)=>a+b,0)/devDataArr.length);
+  const currMean=Math.round(devDataArr.map(ld=>ld.currData.totalPct).reduce((a,b)=>a+b,0)/devDataArr.length);
+  const clsDev=currMean-prevMean;
+  let cT=`<table class="tbl"><thead><tr><th>Previous (${devLabel})</th><th>Level</th><th>Current (${epLabel})</th><th>Level</th><th>Deviation</th></tr></thead><tbody>`;
+  cT+=`<tr><td><b>${prevMean}%</b></td><td>${anaBadge(getCbeLvl(prevMean))}</td><td><b>${currMean}%</b></td><td>${anaBadge(getCbeLvl(currMean))}</td><td class="${anaDevColor(clsDev)}"><b>${anaDevArrow(clsDev)} ${anaDevStr(clsDev)}</b></td></tr></tbody></table>`;
+  // iii. Subject deviation
+  const sDevData=ANA_SUBJS.map(s=>{
+    const pv=Math.round(devDataArr.map(ld=>ld.prevData.subs[s].pct).reduce((a,b)=>a+b,0)/devDataArr.length);
+    const cu=Math.round(devDataArr.map(ld=>ld.currData.subs[s].pct).reduce((a,b)=>a+b,0)/devDataArr.length);
+    return {s,pv,cu,dev:cu-pv,pvL:getCbeLvl(pv),cuL:getCbeLvl(cu)};
+  }).sort((a,b)=>b.dev-a.dev);
+  let sT=`<table class="tbl"><thead><tr><th>Pos</th><th>Subject</th><th>Prev (${devLabel})</th><th>Prev Lvl</th><th>Current (${epLabel})</th><th>Curr Lvl</th><th>Deviation</th></tr></thead><tbody>`;
+  sDevData.forEach((item,i)=>{
+    sT+=`<tr><td>${i+1}</td><td>${item.s}</td><td>${item.pv}%</td><td>${anaBadge(item.pvL)}</td><td>${item.cu}%</td><td>${anaBadge(item.cuL)}</td><td class="${anaDevColor(item.dev)}"><b>${anaDevArrow(item.dev)} ${anaDevStr(item.dev)}</b></td></tr>`;
+  });
+  sT+=`</tbody></table>`;
+  return `
+    <div style="margin-bottom:12px">
+      <div class="ana-subsub">i. Individual Learner Deviation</div>${iT}
+    </div>
+    <div style="margin-bottom:12px">
+      <div class="ana-subsub">ii. ${gradeLabel} Class Deviation</div>${cT}
+    </div>
+    <div style="margin-bottom:12px">
+      <div class="ana-subsub">iii. Subject Deviation</div>${sT}
+    </div>`;
+}
+
+// ---- Section A: Grade Analysis ----
+function genGradeAnalysis() {
+  const term=document.getElementById('anaTermSel_A').value;
+  const epKey=document.getElementById('anaExamSel_A').value;
+  const grade=document.getElementById('anaGradeSel_A').value;
+  if(!term||!epKey||!grade) return alert("Please select Term, Exam Period and Grade");
+  const gradeLearners=LEARNERS.filter(l=>l.grade===grade);
+  if(gradeLearners.length===0) return alert("No learners found for Grade "+grade);
+  const epLabel=EXAM_PERIODS[epKey]?.label||epKey;
+  const termLabel=term==='t1'?'TERM 1':term==='t2'?'TERM 2':'TERM 3';
+  const schoolName=getSchoolName();
+  const learnerDataArr=gradeLearners.map(l=>({...l, examData:anaGetLearnerData(l.adm,term,epKey)}));
+
+  const devOptions=Object.keys(EXAM_PERIODS).filter(k=>k!==epKey)
+    .map(k=>`<option value="${k}">${EXAM_PERIODS[k].label}</option>`).join('');
+
+  const html=`<div id="anaGradePrintArea">
+    <div class="only-print ana-print-header">
+      <h2>${schoolName}</h2>
+      <h3>GRADE ${grade} PERFORMANCE ANALYSIS &mdash; ${termLabel} | ${epLabel}</h3>
+    </div>
+    <div class="no-print card" style="display:flex; align-items:center; gap:10px; background:var(--bl); padding:10px; border-radius:8px; margin-bottom:8px">
+      <span style="font-weight:900; color:var(--b); font-size:11px">GRADE ${grade} | ${termLabel} | ${epLabel}</span>
+      <button class="btn btn-g" style="margin-left:auto; padding:6px 14px; font-size:11px" onclick="window.print()">🖨 Print</button>
+    </div>
+    <div class="card">
+      <div class="ana-subtitle">a. Overall Performance</div>
+      ${buildOverallPerfTable(learnerDataArr)}
+
+      <div class="ana-subtitle">b. Level Distribution</div>
+      ${buildLevelDistTable(learnerDataArr)}
+
+      <div class="ana-subtitle">c. Subject Performance</div>
+      <div class="ana-subsub">iii. Subject Comparison (ranked by meanscore)</div>
+      ${buildSubjCompTable(learnerDataArr)}
+      <div class="ana-subsub" style="margin-top:14px">i &amp; ii. Per-Subject Performance &amp; Level Distribution</div>
+      ${buildPerSubjTables(learnerDataArr)}
+
+      <div class="ana-subtitle">d. Deviations</div>
+      <div class="no-print" style="background:var(--gol); padding:10px; border-radius:8px; margin-bottom:10px">
+        <label class="fl">Select Previous Exam Period for Deviation Calculation</label>
+        <select class="fsel" id="anaDevSel_A" style="margin-bottom:0" onchange="genGradeDeviation()">
+          <option value="">-- Select Previous Exam Period --</option>${devOptions}
+        </select>
+      </div>
+      <div id="anaDeviationContent_A"><p style="color:var(--sub); font-size:11px; text-align:center; padding:10px">Select a previous exam period above to compute deviations</p></div>
+    </div>
+  </div>`;
+
+  document.getElementById('anaGradeContent').innerHTML=html;
+  document.getElementById('anaGradeContent').style.display='block';
+  window._anaCtxA={term,epKey,grade,gradeLearners,learnerDataArr,epLabel,termLabel,schoolName};
+}
+
+function genGradeDeviation() {
+  const ctx=window._anaCtxA; if(!ctx) return;
+  const devKey=document.getElementById('anaDevSel_A')?.value; if(!devKey) return;
+  const devLabel=EXAM_PERIODS[devKey]?.label||devKey;
+  const {term,epKey,grade,gradeLearners,epLabel,termLabel}=ctx;
+  const devDataArr=gradeLearners.map(l=>({...l,prevData:anaGetLearnerData(l.adm,term,devKey),currData:anaGetLearnerData(l.adm,term,epKey)}));
+  document.getElementById('anaDeviationContent_A').innerHTML=buildDeviationSection(devDataArr,devLabel,epLabel,'Grade '+grade);
+}
+
+// ---- Section B: School Analysis ----
+function genSchoolAnalysis() {
+  const term=document.getElementById('anaTermSel_B').value;
+  const epKey=document.getElementById('anaExamSel_B').value;
+  if(!term||!epKey) return alert("Please select Term and Exam Period");
+  const epLabel=EXAM_PERIODS[epKey]?.label||epKey;
+  const termLabel=term==='t1'?'TERM 1':term==='t2'?'TERM 2':'TERM 3';
+  const schoolName=getSchoolName();
+
+  const grades=['7','8','9'];
+  let gradesData={};
+  grades.forEach(g=>{
+    const gl=LEARNERS.filter(l=>l.grade===g);
+    gradesData[g]={learners:gl, arr:gl.map(l=>({...l,examData:anaGetLearnerData(l.adm,term,epKey)}))};
+  });
+  const allLearners=grades.flatMap(g=>gradesData[g].arr);
+
+  // ---- Grade summary comparison table ----
+  let gradeSumTable=`<table class="tbl"><thead><tr><th>Pos</th><th>Grade</th><th>No. of Learners</th><th>Meanscore(%)</th><th>Avg Points</th><th>Level</th></tr></thead><tbody>`;
+  const gradeSums=grades.map(g=>{
+    const arr=gradesData[g].arr;
+    if(arr.length===0) return {g,mean:0,pts:0,lvl:'—',cnt:0};
+    const mean=Math.round(arr.map(ld=>ld.examData.totalPct).reduce((a,b)=>a+b,0)/arr.length);
+    const lvl=getCbeLvl(mean); const pts=getCbePts(lvl);
+    return {g,mean,pts,lvl,cnt:arr.length};
+  }).sort((a,b)=>b.mean-a.mean);
+  gradeSums.forEach((item,i)=>{
+    gradeSumTable+=`<tr><td><b>${i+1}</b></td><td><b>Grade ${item.g}</b></td><td>${item.cnt}</td><td><b>${item.mean}%</b></td><td><b>${item.pts}</b></td><td>${anaBadge(item.lvl)} ${item.lvl}</td></tr>`;
+  });
+  gradeSumTable+=`</tbody></table>`;
+
+  // ---- Per-grade sections ----
+  let perGradeHtml='';
+  grades.forEach(g=>{
+    const arr=gradesData[g].arr;
+    if(arr.length===0){perGradeHtml+=`<div class="ana-subj-block"><div class="ana-subj-name">GRADE ${g}</div><p style="color:var(--sub);font-size:11px">No learners registered for Grade ${g}</p></div>`;return;}
+    perGradeHtml+=`
+    <div style="margin-bottom:20px; border:1px solid var(--border); border-radius:8px; padding:12px">
+      <div style="display:flex; align-items:center; margin-bottom:10px; gap:8px">
+        <span class="ana-grade-tag">GRADE ${g}</span>
+        <span style="font-weight:800; color:var(--nav); font-size:11px">${arr.length} learners</span>
+      </div>
+      <div class="ana-subsub">Overall Performance</div>
+      ${buildOverallPerfTable(arr)}
+      <div class="ana-subsub">Level Distribution</div>
+      ${buildLevelDistTable(arr)}
+      <div class="ana-subsub">Subject Comparison</div>
+      ${buildSubjCompTable(arr)}
+    </div>`;
+  });
+
+  // ---- Cross-grade subject comparison ----
+  let crossSubjTable=`<table class="tbl"><thead><tr><th>Pos</th><th>Subject</th><th>Grade 7 Mean</th><th>G7 Lvl</th><th>Grade 8 Mean</th><th>G8 Lvl</th><th>Grade 9 Mean</th><th>G9 Lvl</th><th>School Mean</th><th>Lvl</th></tr></thead><tbody>`;
+  const crossSubjData=ANA_SUBJS.map(s=>{
+    const gMeans=grades.map(g=>{
+      const arr=gradesData[g].arr;
+      const mean=arr.length>0?Math.round(arr.map(ld=>ld.examData.subs[s].pct).reduce((a,b)=>a+b,0)/arr.length):0;
+      return {mean, lvl:getCbeLvl(mean)};
+    });
+    const allPcts=allLearners.map(ld=>ld.examData.subs[s].pct);
+    const schoolMean=allPcts.length>0?Math.round(allPcts.reduce((a,b)=>a+b,0)/allPcts.length):0;
+    const schoolLvl=getCbeLvl(schoolMean);
+    return {s, gMeans, schoolMean, schoolLvl};
+  }).sort((a,b)=>b.schoolMean-a.schoolMean);
+  crossSubjData.forEach((item,i)=>{
+    crossSubjTable+=`<tr><td><b>${i+1}</b></td><td>${item.s}</td>`;
+    item.gMeans.forEach(gm=>{ crossSubjTable+=`<td>${gm.mean}%</td><td>${anaBadge(gm.lvl)}</td>`; });
+    crossSubjTable+=`<td><b>${item.schoolMean}%</b></td><td>${anaBadge(item.schoolLvl)}</td></tr>`;
+  });
+  crossSubjTable+=`</tbody></table>`;
+
+  // ---- School-wide level distribution ----
+  const lvlCounts={};
+  allLearners.forEach(ld=>{ const lv=ld.examData.totalLvl; lvlCounts[lv]=(lvlCounts[lv]||0)+1; });
+  const lvlSorted=Object.entries(lvlCounts).sort((a,b)=>b[1]-a[1]);
+  let schoolLvlTable=`<table class="tbl"><thead><tr><th>Pos</th><th>Level</th><th>Description</th><th>Total Learners</th></tr></thead><tbody>`;
+  lvlSorted.forEach(([lv,cnt],i)=>{ schoolLvlTable+=`<tr><td><b>${i+1}</b></td><td>${anaBadge(lv)} <b>${lv}</b></td><td>${anaLevelDesc(lv)}</td><td><b>${cnt}</b></td></tr>`; });
+  schoolLvlTable+=`</tbody></table>`;
+
+  // ---- School deviation ----
+  const devOptions=Object.keys(EXAM_PERIODS).filter(k=>k!==epKey)
+    .map(k=>`<option value="${k}">${EXAM_PERIODS[k].label}</option>`).join('');
+
+  const html=`<div id="anaSchoolPrintArea">
+    <div class="only-print ana-print-header">
+      <h2>${schoolName}</h2>
+      <h3>SCHOOL PERFORMANCE ANALYSIS &mdash; ${termLabel} | ${epLabel} | GRADES 7, 8 &amp; 9</h3>
+    </div>
+    <div class="no-print card" style="display:flex; align-items:center; gap:10px; background:var(--bl); padding:10px; border-radius:8px; margin-bottom:8px">
+      <span style="font-weight:900; color:var(--b); font-size:11px">SCHOOL ANALYSIS | ${termLabel} | ${epLabel}</span>
+      <button class="btn btn-g" style="margin-left:auto; padding:6px 14px; font-size:11px" onclick="window.print()">🖨 Print</button>
+    </div>
+    <div class="card">
+      <div class="ana-subtitle">Grade Summary Comparison</div>
+      ${gradeSumTable}
+
+      <div class="ana-subtitle">School-Wide Level Distribution</div>
+      ${schoolLvlTable}
+
+      <div class="ana-subtitle">Subject Comparison Across All Grades</div>
+      <div style="overflow-x:auto">${crossSubjTable}</div>
+
+      <div class="ana-subtitle">Per-Grade Detailed Analysis</div>
+      ${perGradeHtml}
+
+      <div class="ana-subtitle">School Deviations</div>
+      <div class="no-print" style="background:var(--gol); padding:10px; border-radius:8px; margin-bottom:10px">
+        <label class="fl">Select Previous Exam Period for Deviation Calculation</label>
+        <select class="fsel" id="anaDevSel_B" style="margin-bottom:0" onchange="genSchoolDeviation()">
+          <option value="">-- Select Previous Exam Period --</option>${devOptions}
+        </select>
+      </div>
+      <div id="anaDeviationContent_B"><p style="color:var(--sub);font-size:11px;text-align:center;padding:10px">Select a previous exam period above to compute deviations</p></div>
+    </div>
+  </div>`;
+
+  document.getElementById('anaSchoolContent').innerHTML=html;
+  document.getElementById('anaSchoolContent').style.display='block';
+  window._anaCtxB={term,epKey,gradesData,grades,epLabel,termLabel,schoolName};
+}
+
+function genSchoolDeviation() {
+  const ctx=window._anaCtxB; if(!ctx) return;
+  const devKey=document.getElementById('anaDevSel_B')?.value; if(!devKey) return;
+  const devLabel=EXAM_PERIODS[devKey]?.label||devKey;
+  const {term,epKey,gradesData,grades,epLabel}=ctx;
+  let html='';
+  grades.forEach(g=>{
+    const gl=gradesData[g].learners;
+    if(gl.length===0) return;
+    const devDataArr=gl.map(l=>({...l,prevData:anaGetLearnerData(l.adm,term,devKey),currData:anaGetLearnerData(l.adm,term,epKey)}));
+    html+=`<div style="margin-bottom:20px; border:1px solid var(--border); border-radius:8px; padding:10px">
+      <span class="ana-grade-tag" style="display:inline-block; margin-bottom:8px">GRADE ${g}</span>
+      ${buildDeviationSection(devDataArr,devLabel,epLabel,'Grade '+g)}
+    </div>`;
+  });
+  document.getElementById('anaDeviationContent_B').innerHTML=html||'<p style="color:var(--sub);font-size:11px;text-align:center">No learner data available</p>';
+}
+
+// ---- Section C: Individual Learner Graphs ----
+function anaPopulateLearners() {
+  const grade=document.getElementById('anaGradeSel_C').value;
+  const sel=document.getElementById('anaLearnerSel_C');
+  sel.innerHTML='<option value="">-- Select Learner --</option>';
+  if(!grade) return;
+  LEARNERS.filter(l=>l.grade===grade).sort((a,b)=>a.name.localeCompare(b.name))
+    .forEach(l=>{ sel.innerHTML+=`<option value="${l.adm}">${l.name}</option>`; });
+}
+
+function anaDestroyCharts() {
+  anaCharts.forEach(c=>{ try{c.destroy();}catch(e){} });
+  anaCharts=[];
+}
+
+function anaLoadChartJs(callback) {
+  if(typeof Chart !== 'undefined') { callback(); return; }
+  const s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js';
+  s.onload = callback;
+  s.onerror = () => {
+    alert("Chart.js could not load. Please check your internet connection to use graphs.");
+  };
+  document.head.appendChild(s);
+}
+
+function genLearnerGraphs() {
+  const adm=document.getElementById('anaLearnerSel_C').value;
+  const grade=document.getElementById('anaGradeSel_C').value;
+  const term=document.getElementById('anaTermSel_C').value;
+  if(!adm||!grade||!term) return;
+  anaLoadChartJs(()=>_renderLearnerGraphs(adm,grade,term));
+}
+
+function _renderLearnerGraphs(adm,grade,term) {
+  const learner=LEARNERS.find(l=>l.adm===adm); if(!learner) return;
+  const termLabel=term==='t1'?'TERM 1':term==='t2'?'TERM 2':'TERM 3';
+  const schoolName=getSchoolName();
+  const allEpKeys=Object.keys(EXAM_PERIODS);
+  if(allEpKeys.length===0) return alert("No exam periods defined.");
+
+  // Use last period as "current"
+  const curEpKey=allEpKeys[allEpKeys.length-1];
+  const curEpLabel=EXAM_PERIODS[curEpKey]?.label||curEpKey;
+  const curData=anaGetLearnerData(adm,term,curEpKey);
+
+  // Gather class data for current period
+  const gradeLearners=LEARNERS.filter(l=>l.grade===grade);
+  const classDataArr=gradeLearners.map(l=>({...l,examData:anaGetLearnerData(l.adm,term,curEpKey)}));
+
+  // Graph a: Subject bar chart — Learner marks vs 100
+  const subjPcts=ANA_SUBJS.map(s=>curData.subs[s]?.pct||0);
+  const subjColors=['#1d4ed8','#15803d','#d97706','#7c3aed','#dc2626','#0f766e','#c2410c','#1e40af','#065f46'];
+
+  // Graph b: Previous exams comparison
+  const prevEpData=allEpKeys.map(k=>({
+    label:EXAM_PERIODS[k]?.label||k,
+    key:k,
+    pct:anaGetLearnerData(adm,term,k).totalPct
+  }));
+
+  // Graph c: Learner vs Class meanscore per subject
+  const classMeans=ANA_SUBJS.map(s=>{
+    const pcts=classDataArr.map(ld=>ld.examData.subs[s].pct);
+    return pcts.length>0?Math.round(pcts.reduce((a,b)=>a+b,0)/pcts.length):0;
+  });
+
+  const html=`<div id="anaGraphPrintArea">
+    <div class="only-print ana-print-header">
+      <h2>${schoolName}</h2>
+      <h3>INDIVIDUAL LEARNER ANALYSIS — ${learner.name} | Grade ${grade} | ${termLabel}</h3>
+    </div>
+    <div class="no-print card" style="display:flex; align-items:center; gap:10px; background:var(--bl); padding:10px; border-radius:8px; margin-bottom:8px">
+      <span style="font-weight:900; color:var(--b); font-size:11px">📈 ${learner.name} | Grade ${grade} | ${termLabel}</span>
+      <button class="btn btn-g" style="margin-left:auto; padding:6px 14px; font-size:11px" onclick="window.print()">🖨 Print</button>
+    </div>
+    <div class="card">
+      <div class="ana-subtitle">a. Subject Performance (${curEpLabel})</div>
+      <div class="chart-container" style="height:280px"><canvas id="chartSubjBar"></canvas></div>
+
+      <div class="ana-subtitle">b. Performance Across Exam Periods</div>
+      <div class="chart-container" style="height:280px"><canvas id="chartPrevExams"></canvas></div>
+
+      <div class="ana-subtitle">c. Learner vs Class Meanscore Per Subject (${curEpLabel})</div>
+      <div class="chart-container" style="height:280px"><canvas id="chartVsClass"></canvas></div>
+    </div>
+  </div>`;
+
+  anaDestroyCharts();
+  document.getElementById('anaGraphContent').innerHTML=html;
+  document.getElementById('anaGraphContent').style.display='block';
+
+  // Render Chart a: Subject Performance Bar
+  const ctxA=document.getElementById('chartSubjBar').getContext('2d');
+  anaCharts.push(new Chart(ctxA,{
+    type:'bar',
+    data:{
+      labels:ANA_SUBJS_SHORT,
+      datasets:[{
+        label:'Marks (%)',
+        data:subjPcts,
+        backgroundColor:subjColors,
+        borderColor:subjColors.map(c=>c),
+        borderWidth:1
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},title:{display:true,text:`${learner.name} — Subject Performance (${curEpLabel})`,font:{size:12}}},
+      scales:{y:{min:0,max:100,title:{display:true,text:'Marks (%)'}},x:{ticks:{font:{size:10}}}}
+    }
+  }));
+
+  // Render Chart b: Previous exams — bar (prev=blue, current=green) + line trend
+  const prevBgColors=prevEpData.map((ep,i)=>i===prevEpData.length-1?'#15803d':'#93c5fd');
+  const prevBorderColors=prevEpData.map((ep,i)=>i===prevEpData.length-1?'#14532d':'#1d4ed8');
+  const ctxB=document.getElementById('chartPrevExams').getContext('2d');
+  anaCharts.push(new Chart(ctxB,{
+    type:'bar',
+    data:{
+      labels:prevEpData.map(e=>e.label),
+      datasets:[
+        {type:'bar',label:'Total (%)',data:prevEpData.map(e=>e.pct),backgroundColor:prevBgColors,borderColor:prevBorderColors,borderWidth:1,order:2},
+        {type:'line',label:'Trend',data:prevEpData.map(e=>e.pct),borderColor:'#f59e0b',borderWidth:2,pointBackgroundColor:'#f59e0b',fill:false,tension:0.4,order:1}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:true},title:{display:true,text:`${learner.name} — Exam Period Performance (Current = Green)`,font:{size:12}}},
+      scales:{y:{min:0,max:100,title:{display:true,text:'Overall Mean (%)'}}}
+    }
+  }));
+
+  // Render Chart c: Learner vs Class Meanscore (grouped bar)
+  const ctxC=document.getElementById('chartVsClass').getContext('2d');
+  anaCharts.push(new Chart(ctxC,{
+    type:'bar',
+    data:{
+      labels:ANA_SUBJS_SHORT,
+      datasets:[
+        {label:`${learner.name}`,data:subjPcts,backgroundColor:'rgba(29,78,216,0.75)',borderColor:'#1d4ed8',borderWidth:1},
+        {label:'Class Meanscore',data:classMeans,backgroundColor:'rgba(21,128,61,0.6)',borderColor:'#15803d',borderWidth:1}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:true},title:{display:true,text:`${learner.name} vs Class Mean Per Subject (${curEpLabel})`,font:{size:12}}},
+      scales:{y:{min:0,max:100,title:{display:true,text:'Marks (%)'}},x:{ticks:{font:{size:10}}}}
+    }
+  }));
+}
+
+
+// ============================================================
+// UNIVERSAL EXCEL EXPORT (CSV download)
+// ============================================================
+function exportToCSV(sourceId, filename){
+  const container = document.getElementById(sourceId);
+  if(!container) return alert("Nothing to export.");
+  const tables = container.querySelectorAll('table');
+  if(!tables.length) return alert("No table found to export.");
+  let csvParts = [];
+  tables.forEach((table, ti) => {
+    if(ti > 0) csvParts.push(''); // blank row between tables
+    table.querySelectorAll('tr').forEach(row => {
+      let cells = [];
+      row.querySelectorAll('th, td').forEach(cell => {
+        // Get text, strip extra whitespace, escape quotes
+        let text = cell.innerText.replace(/\n/g,' ').replace(/\s+/g,' ').trim();
+        text = text.replace(/"/g, '""');
+        if(text.includes(',') || text.includes('"') || text.includes('\n')) text = '"'+text+'"';
+        cells.push(text);
+      });
+      csvParts.push(cells.join(','));
+    });
+  });
+  const csv = csvParts.join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (filename||'export').replace(/\s+/g,'_') + '_' + new Date().toLocaleDateString().replace(/\//g,'-') + '.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ============================================================
+// TIMETABLE LANDSCAPE PRINT
+// ============================================================
+function printTimetable(tableId){
+  const table = document.getElementById(tableId);
+  if(!table) return window.print();
+  const label = document.getElementById(tableId==='classTable'?'classLabel':'teacherLabel')?.innerText || '';
+  const schoolName = getSchoolName();
+  const win = window.open('','_blank','width=900,height=600');
+  win.document.write(`<!DOCTYPE html><html><head><title>${label}</title>
+  <style>
+    @page { size: A4 landscape; margin: 8mm; }
+    body { font-family: Arial, sans-serif; font-size: 9px; margin:0; }
+    h2 { text-align:center; font-size:13px; margin:0 0 2px; }
+    h3 { text-align:center; font-size:10px; margin:0 0 6px; font-weight:700; }
+    table { width:100%; border-collapse:collapse; table-layout:fixed; }
+    th, td { border:1px solid #000; padding:3px 4px; text-align:center; vertical-align:middle; word-break:break-word; font-size:8px; }
+    th { background:#f0f0f0; font-weight:bold; }
+    .day-cell { font-weight:bold; background:#f9f9f9; width:55px; }
+    .break-cell { font-weight:bold; background:#f0f0f0; font-size:10px; }
+    .subj-line { font-weight:bold; font-size:8px; display:block; }
+    .info-line { font-size:7px; display:block; color:#444; }
+  </style></head><body>
+  <h2>${schoolName}</h2>
+  <h3>${label}</h3>
+  ${table.outerHTML}
+  <script>window.onload=()=>{window.print();window.close();}<\/script>
+  </body></html>`);
+  win.document.close();
 }
 
 function clearTimetableData() {
