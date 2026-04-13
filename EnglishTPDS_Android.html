@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>English TPDS v3 – Desktop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+
+:root{--bg:#f2ede4;--card:#ffffff;--primary:#1b4332;--primary-l:#2d6a4f;--primary-xl:#40916c;--accent:#c9963a;--accent-l:#f5e6c4;--accent-d:#a07228;--danger:#b5281c;--success:#065f46;--text:#242424;--muted:#687280;--border:#d8d2c6;--border-l:#ede8e0;--shadow:0 2px 10px rgba(0,0,0,.09);--r:8px;--g7:#dbeafe;--g7t:#1e40af;--g8:#d1fae5;--g8t:#065f46;--g9:#fef3c7;--g9t:#92400e;}
+html.dark{--bg:#0d1f16;--card:#152a1e;--primary:#40916c;--primary-l:#52b788;--accent:#d4a04a;--accent-l:#3a2d10;--accent-d:#f0c060;--danger:#dc4a3d;--success:#10b981;--text:#e8e3da;--muted:#8fa896;--border:#2a4035;--border-l:#1e3028;--shadow:0 2px 10px rgba(0,0,0,.4);--g7:#1e3a5f;--g7t:#93c5fd;--g8:#1a3028;--g8t:#6ee7b7;--g9:#3a2800;--g9t:#fcd34d;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.5;transition:background .3s,color .3s}
+.login-overlay{position:fixed;inset:0;background:linear-gradient(135deg,#1b4332 0%,#2d6a4f 50%,#1b4332 100%);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-box{background:#fff;border-radius:16px;padding:30px 22px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.4);text-align:center}
+.login-icon{font-size:2.8rem;margin-bottom:10px}
+.login-box h2{font-family:'Crimson Pro',serif;font-size:1.5rem;color:#1b4332;margin-bottom:4px}
+.lg-school{font-weight:700;color:#1b4332;font-size:.9rem;margin-bottom:2px}
+.login-box p{font-size:.78rem;color:#687280;margin-bottom:20px}
+.login-box .form-group{text-align:left;margin-bottom:12px}
+.login-err{color:#b5281c;font-size:.82rem;min-height:18px;margin-top:8px}
+.login-footer{font-size:.7rem;color:#687280;margin-top:14px}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.login-box.shake{animation:shake .4s ease}
+.app-header{background:var(--primary);color:#fff;padding:8px 12px;padding-top:calc(8px + env(safe-area-inset-top,0px));display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.25);min-height:52px}
+.app-header h1{font-family:'Crimson Pro',serif;font-size:1.15rem;font-weight:700;letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55vw}
+.app-header .sub{font-size:.65rem;opacity:.7;font-style:italic;margin-top:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55vw}
+.app-header .hdr-right{text-align:right;font-size:.7rem;opacity:.85;line-height:1.5;display:none}
+.hdr-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:7px 10px;border-radius:8px;cursor:pointer;font-size:.78rem;margin-left:5px;font-family:'DM Sans',sans-serif;transition:background .2s;min-width:36px;min-height:36px;display:inline-flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
+.hdr-btn:hover{background:rgba(255,255,255,.28)}
+.hdr-actions{display:flex;align-items:center}
+.bf-stepper{display:none;overflow-x:auto;scrollbar-width:none;padding:5px 8px;gap:4px;background:var(--primary-l);border-bottom:2px solid var(--accent);position:sticky;top:calc(94px + env(safe-area-inset-top,0px));z-index:95;-webkit-overflow-scrolling:touch}
+.bf-stepper.visible{display:flex}
+.bf-stepper::-webkit-scrollbar{display:none}
+.stepper-chip{flex-shrink:0;padding:3px 9px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:20px;color:rgba(255,255,255,.75);font-size:.67rem;cursor:pointer;white-space:nowrap;transition:all .2s}
+.stepper-chip.active{background:var(--accent);border-color:var(--accent);color:#1a1000;font-weight:700}
+.tab-nav{background:var(--primary);display:flex;overflow-x:auto;scrollbar-width:none;border-bottom:3px solid var(--accent);padding:0 2px;gap:0;position:sticky;top:calc(52px + env(safe-area-inset-top,0px));z-index:99;-webkit-overflow-scrolling:touch}
+.tab-nav::-webkit-scrollbar{display:none}
+.tab-btn{flex-shrink:0;padding:10px 12px;background:transparent;border:none;color:rgba(255,255,255,.6);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:500;white-space:nowrap;position:relative;transition:color .2s;min-height:42px;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.tab-btn::after{content:'';position:absolute;bottom:-3px;left:0;right:0;height:3px;background:var(--accent);transform:scaleX(0);transition:transform .25s}
+.tab-btn.active{color:#fff;font-weight:600}
+.tab-btn.active::after{transform:scaleX(1)}
+.tab-btn:hover{color:rgba(255,255,255,.9)}
+.tab-content{display:none;padding:14px 12px;padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));max-width:100%;margin:0 auto}
+.tab-content.active{display:block}
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:14px 14px;margin-bottom:12px;border:1px solid var(--border);transition:background .3s,border-color .3s}
+.card-title{font-family:'Crimson Pro',serif;font-size:1.1rem;font-weight:700;color:var(--primary);margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid var(--accent-l);display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.form-grid{display:grid;grid-template-columns:1fr;gap:10px}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-group.full{grid-column:1/-1}
+label.fl{font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+input,select,textarea{padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:15px;color:var(--text);background:var(--bg);transition:border-color .2s,background .3s;width:100%;min-height:44px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary);background:var(--card)}
+textarea{resize:vertical;min-height:80px;line-height:1.6;font-size:14px}
+textarea.tall{min-height:130px}
+input[readonly],textarea[readonly]{background:var(--border-l);color:var(--muted)}
+.btn{padding:10px 18px;border:none;border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;transition:all .2s;display:inline-flex;align-items:center;gap:6px;min-height:44px;white-space:nowrap;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-l)}
+.btn-accent{background:var(--accent);color:#2a2a2a}.btn-accent:hover{background:var(--accent-d);color:#fff}
+.btn-success{background:var(--success);color:#fff}.btn-success:hover{filter:brightness(1.1)}
+.btn-danger{background:var(--danger);color:#fff}.btn-danger:hover{filter:brightness(1.1)}
+.btn-outline{background:transparent;border:1.5px solid var(--primary);color:var(--primary)}.btn-outline:hover{background:var(--primary);color:#fff}
+.btn-ghost{background:transparent;border:1.5px solid var(--border);color:var(--muted)}.btn-ghost:hover{border-color:var(--primary);color:var(--primary)}
+.btn-sm{padding:8px 13px;font-size:13px;min-height:36px}.btn-xs{padding:5px 10px;font-size:12px;min-height:30px}
+.btn-group{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.data-table{width:100%;border-collapse:collapse;font-size:13px}
+.data-table th{background:var(--primary);color:#fff;padding:8px 10px;text-align:left;font-weight:500;font-size:12px;letter-spacing:.3px}
+.data-table td{padding:7px 10px;border-bottom:1px solid var(--border-l);vertical-align:top}
+.data-table tr:hover td{background:var(--border-l)}
+.tbl-wrap{overflow-x:auto;border-radius:var(--r);border:1px solid var(--border)}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.bg-green{background:#d1fae5;color:#065f46}.bg-blue{background:#dbeafe;color:#1e40af}
+.bg-yellow{background:#fef9c3;color:#854d0e}.bg-red{background:#fee2e2;color:#991b1b}
+.bg-gray{background:var(--border-l);color:var(--muted)}
+.att-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px}
+.att-box{border-radius:8px;padding:10px 6px;text-align:center;border:2px solid transparent}
+.att-box.ee{background:#dcfce7;border-color:#86efac}.att-box.me{background:#dbeafe;border-color:#93c5fd}
+.att-box.ae{background:#fef3c7;border-color:#fcd34d}.att-box.be{background:#fee2e2;border-color:#fca5a5}
+html.dark .att-box.ee{background:#14532d;border-color:#166534}html.dark .att-box.me{background:#1e3a8a;border-color:#3b82f6}
+html.dark .att-box.ae{background:#451a03;border-color:#d97706}html.dark .att-box.be{background:#450a0a;border-color:#dc2626}
+.att-label{font-weight:800;font-size:1rem;margin-bottom:2px}
+.att-box.ee .att-label{color:#166534}.att-box.me .att-label{color:#1e40af}
+.att-box.ae .att-label{color:#92400e}.att-box.be .att-label{color:#991b1b}
+html.dark .att-box.ee .att-label{color:#4ade80}html.dark .att-box.me .att-label{color:#93c5fd}
+html.dark .att-box.ae .att-label{color:#fbbf24}html.dark .att-box.be .att-label{color:#f87171}
+.att-desc{font-size:.6rem;color:var(--muted);margin-bottom:5px;line-height:1.2}
+.att-box input{text-align:center;font-size:1.1rem;font-weight:700;padding:4px;border-radius:4px}
+.att-total{font-size:.8rem;color:var(--muted);margin-top:6px;text-align:center}
+.cbl{padding:3px 8px;border-radius:12px;font-weight:700;font-size:.78rem}
+.cbl.EE{background:#dcfce7;color:#166534}.cbl.ME{background:#dbeafe;color:#1e40af}
+.cbl.AE{background:#fef3c7;color:#92400e}.cbl.BE{background:#fee2e2;color:#991b1b}
+html.dark .cbl.EE{background:#14532d;color:#4ade80}html.dark .cbl.ME{background:#1e3a8a;color:#93c5fd}
+html.dark .cbl.AE{background:#451a03;color:#fbbf24}html.dark .cbl.BE{background:#450a0a;color:#f87171}
+.lsn-card[data-grade="7"]{border-left:4px solid var(--g7t)}
+.lsn-card[data-grade="8"]{border-left:4px solid var(--g8t)}
+.lsn-card[data-grade="9"]{border-left:4px solid var(--g9t)}
+.dyn-row{display:grid;gap:7px;align-items:center;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:6px;margin-bottom:6px}
+.sched-row{grid-template-columns:1fr 1fr 80px 32px}
+.roll-row-grid{grid-template-columns:1fr 1fr 32px}
+.strand-row{display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;margin-bottom:4px}
+.strand-row span{flex:1;font-size:13px}
+.remove-btn{width:28px;height:28px;border:none;background:#fee2e2;color:#991b1b;border-radius:5px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.remove-btn:hover{background:#fca5a5}
+.theme-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:var(--accent-l);border:1px solid #e8d5a3;border-radius:20px;font-size:12px;margin:3px;color:var(--text)}
+.theme-chip button{border:none;background:none;cursor:pointer;color:var(--accent-d);font-size:14px;line-height:1;padding:0}
+#sigCanvas{border:2px dashed var(--border);border-radius:8px;cursor:crosshair;display:block;background:#fff;touch-action:none;width:100%;max-width:380px;height:130px}
+.step-selector{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.step-lbl{display:flex;align-items:center;gap:5px;padding:6px 12px;border:1.5px solid var(--border);border-radius:6px;cursor:pointer;font-size:13px;transition:all .2s;background:var(--bg);user-select:none;color:var(--text)}
+.step-lbl input{accent-color:var(--primary);width:auto}
+.step-lbl:has(input:checked){border-color:var(--primary);background:#e8f5ee;color:var(--primary);font-weight:600}
+html.dark .step-lbl:has(input:checked){background:#1a3028}
+.step-area{background:var(--bg);border:1.5px solid #9dd4b4;border-radius:8px;padding:12px;margin-bottom:8px}
+.step-area h4{color:var(--primary);margin-bottom:7px;font-size:.85rem;font-weight:600}
+.file-zone{border:2px dashed var(--border);border-radius:8px;padding:16px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg)}
+.file-zone:hover{border-color:var(--primary);background:var(--border-l)}
+.file-zone input[type=file]{display:none}
+.file-list{margin-top:8px}
+.file-item{display:flex;align-items:center;justify-content:space-between;padding:5px 10px;background:var(--border-l);border-radius:4px;margin-bottom:3px;font-size:12px}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:14px}
+.stat-card{background:var(--card);border-radius:var(--r);padding:14px;text-align:center;border:1px solid var(--border)}
+.stat-num{font-family:'Crimson Pro',serif;font-size:2.1rem;font-weight:700;color:var(--primary);line-height:1}
+.stat-lbl{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:3px}
+.progress-bar{background:var(--border);border-radius:4px;height:8px;overflow:hidden;margin-top:4px}
+.progress-fill{height:100%;border-radius:4px;transition:width .6s ease;background:var(--success)}
+.progress-fill.warn{background:var(--accent)}.progress-fill.danger{background:var(--danger)}
+.storage-meter{background:var(--border);border-radius:4px;height:10px;overflow:hidden;margin:6px 0}
+.storage-fill{height:100%;border-radius:4px;transition:width .6s ease;background:var(--success)}
+.storage-fill.warn{background:var(--accent)}.storage-fill.danger{background:var(--danger)}
+.reminder-card{border-left:4px solid var(--danger);background:var(--card);border-radius:6px;padding:10px 14px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.reminder-card.warn{border-left-color:var(--accent)}
+.deleted-card{background:var(--bg);border:1px dashed var(--border);border-radius:6px;padding:8px 12px;margin-bottom:5px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:.82rem}
+.lsn-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:7px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.lsn-info{flex:1;min-width:0}
+.lsn-title{font-weight:600;color:var(--primary);font-size:.88rem;margin-bottom:3px}
+.lsn-meta{font-size:.73rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lsn-actions{display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
+.iep-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:7px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.search-bar{position:relative}
+.search-bar input{padding-left:30px}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;pointer-events:none}
+.grade-tabs{display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap}
+.grade-tab{padding:6px 14px;border:1.5px solid var(--border);border-radius:6px;cursor:pointer;font-size:13px;background:var(--bg);color:var(--muted);transition:all .2s;font-family:'DM Sans',sans-serif}
+.grade-tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.planner-week-label{background:var(--primary);color:#fff;padding:6px 4px;text-align:center;border-radius:4px;font-weight:600;font-size:.75rem;display:flex;align-items:center;justify-content:center;flex-direction:column;line-height:1.2}
+.planner-day-hdr{background:var(--accent);color:#1a1000;padding:4px 2px;text-align:center;border-radius:4px;font-weight:700;font-size:.72rem}
+.planner-cell{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:3px;min-height:46px;font-size:.65rem}
+.planner-chip{border-radius:3px;padding:2px 4px;margin-bottom:2px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.planner-chip.g7{background:var(--g7);color:var(--g7t)}.planner-chip.g8{background:var(--g8);color:var(--g8t)}.planner-chip.g9{background:var(--g9);color:var(--g9t)}
+.planner-empty{color:var(--muted);font-size:.65rem;padding:4px 2px;text-align:center}
+.cal-entry-card{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 12px;margin-bottom:5px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:.82rem}
+.report-section{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:12px}
+.report-section h3{font-family:'Crimson Pro',serif;font-size:1.05rem;color:var(--primary);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border-l)}
+.att-bar-row{display:flex;gap:6px;align-items:center;margin-bottom:6px;font-size:.8rem}
+.att-bar-fill{height:14px;border-radius:3px;transition:width .5s}
+.att-bar-fill.ee{background:#22c55e}.att-bar-fill.me{background:#3b82f6}
+.att-bar-fill.ae{background:#f59e0b}.att-bar-fill.be{background:#ef4444}
+.import-preview-tbl{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:10px}
+.import-preview-tbl th{background:#2d6a4f;color:#fff;padding:6px 8px;font-weight:500}
+.import-preview-tbl td{padding:5px 8px;border-bottom:1px solid var(--border-l);vertical-align:top;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.import-preview-tbl tr:hover td{background:var(--border-l)}
+.import-banner{background:var(--accent-l);border:1.5px solid #9dd4b4;border-radius:8px;padding:12px 14px;margin-top:10px;font-size:13px;color:var(--primary)}
+.flex{display:flex;align-items:center;gap:8px}
+.flex-between{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.mt1{margin-top:8px}.mt2{margin-top:14px}.mt3{margin-top:22px}
+.mb1{margin-bottom:7px}.mb2{margin-bottom:13px}
+.muted{color:var(--muted);font-size:.82rem}
+.divider{height:1px;background:var(--border);margin:14px 0}
+.empty{text-align:center;padding:36px 20px;color:var(--muted)}
+.empty-icon{font-size:2.4rem;margin-bottom:10px}
+.section-head{font-family:'Crimson Pro',serif;font-size:1rem;font-weight:700;color:var(--primary);margin-bottom:10px}
+.info-box{background:var(--accent-l);border:1px solid #e8d5a3;border-radius:6px;padding:10px 14px;font-size:12.5px;color:var(--primary)}
+.notif{position:fixed;top:calc(110px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 18px;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.22);z-index:9998;font-size:13px;animation:slin .3s ease;display:flex;align-items:center;gap:8px;max-width:90vw;white-space:nowrap}
+.notif.err{background:var(--danger)}.notif.ok{background:var(--success)}
+@keyframes slin{from{transform:translateX(110%);opacity:0}to{transform:translateX(0);opacity:1}}
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:flex;align-items:flex-end;justify-content:center;padding:0}
+.modal{background:var(--card);border-radius:12px 12px 0 0;width:100%;max-width:100%;max-height:92vh;overflow-y:auto;padding:16px;position:relative}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;padding-bottom:10px;border-bottom:2px solid var(--accent-l)}
+.modal-title{font-family:'Crimson Pro',serif;font-size:1.2rem;color:var(--primary);font-weight:700}
+.preview-frame{width:100%;height:70vh;border:1px solid var(--border);border-radius:6px;background:#fff}
+.share-bar{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px;padding:10px;background:var(--bg);border-radius:8px;border:1px solid var(--border-l)}
+.share-bar-label{font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;width:100%;margin-bottom:3px}
+.scroll-top-btn{position:fixed;bottom:calc(22px + env(safe-area-inset-bottom,0px));right:16px;width:44px;height:44px;border-radius:50%;background:var(--primary);color:#fff;border:none;cursor:pointer;font-size:18px;box-shadow:0 4px 14px rgba(0,0,0,.25);display:none;align-items:center;justify-content:center;z-index:500;transition:all .2s}
+.scroll-top-btn.show{display:flex}
+.scroll-top-btn:hover{background:var(--primary-l);transform:translateY(-2px)}
+@media print{
+  body{background:#fff;font-size:11.5px}
+  .app-header,.tab-nav,.no-print,.btn,.lsn-card,.lsn-actions,.bf-stepper,.tab-content:not(.printing),.scroll-top-btn,.modal-ov{display:none!important}
+  .printing{display:block!important;padding:0;max-width:100%}
+  .card{box-shadow:none;border:1px solid #ccc;margin-bottom:10px}
+  .print-lp-header{text-align:center;margin-bottom:14px;border-bottom:2px solid #1b4332;padding-bottom:10px}
+  .print-lp-header h2{font-family:'Crimson Pro',serif;font-size:1.4rem;color:#1b4332;font-weight:700}
+  .print-lp-header h3{font-size:.95rem;color:#333;margin-top:3px}
+  .print-lp-header p{font-size:.8rem;color:#555;margin-top:2px}
+  .lp-meta-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;border:1px solid #1b4332;border-radius:4px;padding:8px;margin-bottom:10px}
+  .lp-meta-item label{font-size:.65rem;text-transform:uppercase;font-weight:700;color:#555;display:block}
+  .lp-meta-item span{font-size:.85rem;font-weight:600;color:#1b4332}
+  .lp-section{margin-bottom:10px;border:1px solid #c0c0c0;border-radius:4px;overflow:hidden;page-break-inside:avoid}
+  .lp-section-title{background:#1b4332;color:#fff;padding:5px 10px;font-weight:700;font-size:.8rem;letter-spacing:.3px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .lp-section-body{padding:8px 10px;min-height:36px;white-space:pre-wrap;font-size:.82rem;line-height:1.55}
+  .lp-step-block{border-top:1px solid #e0e0e0;padding:6px 10px;page-break-inside:avoid}
+  .lp-step-block:first-child{border-top:none}
+  .lp-step-label{font-weight:700;color:#1b4332;font-size:.78rem;margin-bottom:3px}
+  .sig-row{display:flex;gap:40px;margin-top:18px;padding-top:10px;border-top:1px solid #ccc;flex-wrap:wrap}
+  .sig-block{text-align:center;margin-bottom:10px}
+  .sig-block img{height:50px;max-width:180px;object-fit:contain}
+  .sig-line{border-top:1px solid #333;margin-top:4px;padding-top:3px;font-size:.75rem;color:#555;width:180px;text-align:center}
+  .sow-table,.row-table{width:100%;border-collapse:collapse;font-size:.73rem}
+  .sow-table th,.row-table th{background:#1b4332;color:#fff;padding:5px 6px;font-size:.72rem;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .sow-table td,.row-table td{border:1px solid #bbb;padding:4px 6px;vertical-align:top;white-space:pre-wrap}
+  .print-section-title{font-family:'Crimson Pro',serif;font-size:1.2rem;color:#1b4332;text-align:center;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid #c9963a;white-space:pre-line}
+  .iep-print-section{margin-bottom:10px;page-break-inside:avoid}
+  .iep-print-section label{font-weight:700;font-size:.78rem;text-transform:uppercase;color:#1b4332;display:block;margin-bottom:3px}
+  .iep-print-box{border:1px solid #ccc;border-radius:4px;padding:7px;min-height:32px;font-size:.82rem;white-space:pre-wrap}
+  .att-print-row{display:flex;gap:14px;margin:8px 0;flex-wrap:wrap}
+  .att-print-box{border:1px solid #bbb;padding:6px 12px;border-radius:4px;text-align:center;font-size:.78rem}
+  .att-print-box .lbl{font-weight:700;font-size:.9rem}
+  /* interactive respond section - hide no-print, show print-only */
+  .resp-actions{display:none!important}
+  .resp-section{border:2px solid #1b4332;border-radius:6px;padding:12px;margin-top:20px;page-break-inside:avoid}
+  .resp-section h3{color:#1b4332;font-size:.95rem;margin-bottom:10px;border-bottom:1px solid #ccc;padding-bottom:6px}
+  .resp-sig-area{border:1px solid #bbb;height:80px;border-radius:4px;display:flex;align-items:flex-end;padding:4px;font-size:.72rem;color:#888}
+}
+
+
+/* ══════════════════════════════════════════
+   ANDROID MOBILE POLISH
+   ══════════════════════════════════════════ */
+
+/* Smooth scrolling and touch feel */
+*{-webkit-tap-highlight-color:transparent;}
+body{-webkit-overflow-scrolling:touch;}
+.tab-nav::-webkit-scrollbar,.bf-stepper::-webkit-scrollbar{display:none;}
+
+/* Stats grid always 2-col on phone */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.stats-grid{grid-template-columns:1fr 1fr!important;}
+
+/* Sched row — stack on phone */
+.sched-row{grid-template-columns:1fr 1fr!important;}
+.dyn-row{gap:6px;padding:10px;}
+
+/* Roll row — single col */
+.roll-row-grid{grid-template-columns:1fr!important;}
+
+/* Section head larger */
+.section-head{font-size:1rem;}
+
+/* Card title slightly smaller */
+.card-title{font-size:1rem;}
+
+/* Grade tabs wrap */
+.grade-tabs{gap:6px;}
+.grade-tab{padding:8px 14px;font-size:13px;min-height:36px;}
+
+/* Lesson card actions — wrap */
+.lsn-actions{flex-wrap:wrap;gap:6px;}
+.lsn-actions .btn{flex:1;min-width:80px;justify-content:center;}
+
+/* Planner — horizontal scroll */
+.planner-grid{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+
+/* Step selector wrap */
+.step-selector{gap:6px;}
+.step-lbl{font-size:13px;padding:8px 12px;min-height:36px;}
+
+/* Import preview table scroll */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+
+/* Signature canvas full width */
+#sigCanvas{max-width:100%;height:110px;}
+
+/* Login box mobile */
+.login-box{padding:28px 20px;max-width:100%;}
+.login-overlay{padding:16px;}
+
+/* Btn group wrap */
+.btn-group{flex-wrap:wrap;}
+.btn-group .btn{flex:1;min-width:140px;justify-content:center;}
+
+/* Flex-between wrap */
+.flex-between{flex-wrap:wrap;gap:8px;}
+
+/* Share bar */
+.share-bar{gap:6px;}
+
+/* Header right — show brief info only */
+@media(max-width:480px){
+  .app-header .hdr-right{display:none!important;}
+}
+
+/* Preview frame — smaller on phone */
+.preview-frame{height:55vh;}
+
+/* Remove hover effects (use active instead) */
+@media(hover:none){
+  .btn:hover{filter:none;}
+  .tab-btn:hover{color:rgba(255,255,255,.6);}
+  .hdr-btn:hover{background:rgba(255,255,255,.15);}
+  .grade-tab:hover{background:var(--bg);color:var(--muted);}
+}
+
+/* Active states for touch */
+.btn:active{filter:brightness(.92);}
+.tab-btn:active{background:rgba(255,255,255,.1);}
+.grade-tab:active{background:var(--primary-l);color:#fff;}
+
+/* Att grid label size */
+.att-label{font-size:.9rem;}
+.att-desc{font-size:.58rem;}
+
+/* Overflow scrolling everywhere */
+.tab-content{overflow-x:hidden;}
+
+/* Stepper chip size */
+.stepper-chip{font-size:.7rem;padding:5px 10px;}
+
+/* Divider spacing */
+.divider{margin:10px 0;}
+
+/* Muted text */
+.muted{font-size:.8rem;}
+
+</style>
+
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TPDS">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAACeElEQVR42u3bsQ0AIQwEQfdBF7Tg/muCFgitY1a6/CWYz6jV+5j9upr4UZNySQAAwAAAwAAAwAAAwAAAwAAAwAAAwAAAwACIBKDsHwoAAgAAAQCAAABAAAAgAAAQAAAIAAAEAAACAAABAIAAAEAAACAAABAAAAgAAAQAAAIAAAEAgAAAQAAAIAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAABAIAAAEAAACAAABAAAAgAAAQAAAIAAAEAgAAAQAAAIAAAEAAARB6YAQCAAQCAAQCAAQCAAQCAAQCAAQCAAQCAAQCAAQCAAQCAAQCAAQCAAQCAAQCAAQAAAAAAAAAAAAAAgLwJBkAAACAAABAAAAgAAAQAAAIAAAEAgAAAQAAAIAAAEAAACAAABAAAAgAAAQCAAABAAAAgAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAEAgAAAQAAAIAAAEAAACAAABAAAAgAAAQCAAABAAAAgAAAQAAAIAAAEAAACAICEAzMAADAAADAAADAAADAAADAAADAAADAAADAAADAAADAAADAAADAAADAAADAAADAAAAAAAAAAAAAAAACQN8EACAAABAAAAgAAAQCAAABAAAAgAAAQAAAIAAAEAAACAAABAIAAAEAAACAAABAAAAgAAAQAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAgAAAQAAAIAAAEAAACAAABAIAAAEAAACAAABAAAAgAAAQAAAIAAAEAgAAAQAAAkHBgBgAABgAABgAABgAABgAABgAABgAABgAA9rYLS+VT27mKScwAAAAASUVORK5CYII=">
+<meta name="theme-color" content="#1b4332">
+</head>
+<body>
+
+<div id="loginOverlay" class="login-overlay">
+  <div class="login-box" id="loginBox">
+    <div class="login-icon">📚</div><h2>English TPDS</h2>
+    <div class="lg-school" id="lgSchool" style="display:none"></div>
+    <p id="lgYear">Teacher Professional Documents System<br>Atiaket Junior School</p>
+    <div class="form-group mt2"><label class="fl">Username</label>
+      <input id="loginUser" type="text" placeholder="Enter username" autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('loginPass').focus()">
+    </div>
+    <div class="form-group mt1"><label class="fl">Password</label>
+      <input id="loginPass" type="password" placeholder="Enter password" autocomplete="current-password">
+    </div>
+    <div id="loginErr" class="login-err"></div>
+    <button class="btn btn-primary mt2" style="width:100%;justify-content:center;font-size:14px" onclick="doLogin()">🔓 Sign In</button>
+    <div class="login-footer">© Atiaket Junior School · English Dept</div>
+  </div>
+</div>
+<header class="app-header">
+  <div><h1>📚 English TPDS</h1><div class="sub" id="hdrSchool">Teacher Professional Documents System</div></div>
+  <div class="hdr-actions">
+    <div class="hdr-right" id="hdrTeacher"></div>
+    <button class="hdr-btn" id="darkBtn" onclick="toggleDark()" title="Toggle dark mode">🌙</button>
+    <button class="hdr-btn" onclick="doLogout()" title="Sign Out">🔒</button>
+  </div>
+</header>
+<div id="bfStepper" class="bf-stepper"></div>
+<nav class="tab-nav">
+  <button class="tab-btn" onclick="switchTab('home')">🏠 Home</button>
+  <button class="tab-btn" onclick="switchTab('setup')">⚙️ Setup</button>
+  <button class="tab-btn" onclick="switchTab('base')">📝 Base Form</button>
+  <button class="tab-btn" onclick="switchTab('lp')">📋 Plans</button>
+  <button class="tab-btn" onclick="switchTab('sow')">📊 SOW</button>
+  <button class="tab-btn" onclick="switchTab('row')">📔 ROW</button>
+  <button class="tab-btn" onclick="switchTab('iep')">🎯 IEPs</button>
+  <button class="tab-btn" onclick="switchTab('planner')">📅 Planner</button>
+  <button class="tab-btn" onclick="switchTab('cal')">🎓 CAL</button>
+  <button class="tab-btn" onclick="switchTab('reports')">📈 Reports</button>
+</nav>
+
+<!-- HOME -->
+<div id="tab-home" class="tab-content">
+  <div class="card"><div class="card-title">📊 Dashboard</div>
+    <div class="stats-grid" id="homeStats"></div>
+    <div class="divider"></div>
+    <div class="section-head">📈 Term Progress by Grade</div>
+    <div id="gradeProgress"></div>
+  </div>
+  <div class="card" id="deletedBinSection" style="display:none">
+    <div class="card-title" style="color:var(--accent-d)">🗑 Recently Deleted <span class="muted" style="font-size:.75rem">(restorable 7 days)</span></div>
+    <div id="deletedList"></div>
+  </div>
+  <div class="card"><div class="card-title">🔔 IEP Review Reminders</div><div id="iepReminders"></div></div>
+  <div class="card"><div class="card-title">💾 Storage &amp; Backup</div>
+    <div id="storageMeter"></div><div id="storageLabel" class="muted mt1"></div>
+    <div class="divider"></div>
+    <div class="btn-group">
+      <button class="btn btn-primary" onclick="exportBackup()">⬇️ Export Backup</button>
+      <label class="btn btn-outline" style="cursor:pointer">⬆️ Import Backup
+        <input type="file" accept=".json" style="display:none" onchange="importBackup(event)"></label>
+    </div>
+    <div class="muted mt1">Export saves all data. Import replaces current data.</div>
+  </div>
+  <div class="card"><div class="card-title">📌 Recent Lessons</div><div id="homeRecentLessons"></div></div>
+</div>
+
+<!-- SETUP -->
+<div id="tab-setup" class="tab-content">
+  <div class="card"><div class="card-title">🏫 School &amp; Teacher</div>
+    <div class="form-grid">
+      <div class="form-group full"><label class="fl">School Name</label><input id="s-school" type="text" placeholder="e.g. Atiaket Junior School"></div>
+      <div class="form-group"><label class="fl">Subject</label><input id="s-subject" type="text" value="English"></div>
+      <div class="form-group"><label class="fl">Teacher Name</label><input id="s-teacher" type="text" placeholder="Full name"></div>
+      <div class="form-group"><label class="fl">TSC Number</label><input id="s-tsc" type="text" placeholder="TSC No."></div>
+      <div class="form-group"><label class="fl">Contact / Email</label><input id="s-contact" type="text" placeholder="Phone or email"></div>
+      <div class="form-group"><label class="fl">Academic Year</label><input id="s-year" type="text" placeholder="e.g. 2025"></div>
+    </div>
+    <div class="divider"></div>
+    <div class="section-head">✍️ Teacher Signature</div>
+    <div class="muted mb1">Draw using mouse or finger</div>
+    <canvas id="sigCanvas"></canvas>
+    <div class="flex mt1"><button class="btn btn-ghost btn-sm" onclick="clearSig()">🗑 Clear</button><span class="muted">Saved with Setup</span></div>
+  </div>
+  <div class="card"><div class="card-title">📚 Grades Taught</div>
+    <div class="flex" style="gap:12px;flex-wrap:wrap">
+      <label class="step-lbl"><input type="checkbox" id="g7" value="7"> Grade 7</label>
+      <label class="step-lbl"><input type="checkbox" id="g8" value="8"> Grade 8</label>
+      <label class="step-lbl"><input type="checkbox" id="g9" value="9"> Grade 9</label>
+    </div>
+  </div>
+  <div class="card"><div class="card-title">🕐 Lesson Schedule</div>
+    <div class="muted mb2">Define periods per grade per day.</div>
+    <div id="scheduleList"></div>
+    <button class="btn btn-outline btn-sm mt1" onclick="addScheduleRow()">+ Add Period</button>
+  </div>
+  <div class="card"><div class="card-title">👥 Class Roll</div><div id="rollList"></div></div>
+  <div class="card">
+    <div class="card-title">📖 Themes per Grade</div>
+    <div class="muted mb2">Select a grade then add its themes.</div>
+    <div class="grade-tabs" id="themeGradeTabs">
+      <button class="grade-tab active" onclick="setThemeGrade(7,this)">Grade 7</button>
+      <button class="grade-tab" onclick="setThemeGrade(8,this)">Grade 8</button>
+      <button class="grade-tab" onclick="setThemeGrade(9,this)">Grade 9</button>
+    </div>
+    <div class="flex mb1" style="gap:8px">
+      <input id="themeInput" type="text" placeholder="Type theme and press Add" style="flex:1">
+      <button class="btn btn-primary btn-sm" onclick="addTheme()">+ Add</button>
+    </div>
+    <div id="themeChips"></div>
+  </div>
+  <!-- STRANDS now grade-specific -->
+  <div class="card">
+    <div class="card-title">🧵 Strands per Grade</div>
+    <div class="muted mb2">Select a grade then manage its strands. Each grade can have different strands.</div>
+    <div class="grade-tabs" id="strandGradeTabs">
+      <button class="grade-tab active" onclick="setStrandGrade(7,this)">Grade 7</button>
+      <button class="grade-tab" onclick="setStrandGrade(8,this)">Grade 8</button>
+      <button class="grade-tab" onclick="setStrandGrade(9,this)">Grade 9</button>
+    </div>
+    <div class="flex mb1" style="gap:8px">
+      <input id="strandInput" type="text" placeholder="Type strand and press Add" style="flex:1">
+      <button class="btn btn-primary btn-sm" onclick="addStrand()">+ Add</button>
+    </div>
+    <div id="strandList"></div>
+  </div>
+  <div class="btn-group">
+    <button class="btn btn-primary" onclick="saveSetupAll()">💾 Save All Setup</button>
+    <button class="btn btn-ghost" onclick="resetSetup()">↺ Reset</button>
+  </div>
+</div>
+
+<!-- BASE FORM -->
+<div id="tab-base" class="tab-content">
+  <div class="card" style="border:2px solid var(--accent);background:var(--accent-l)">
+    <div class="card-title" style="color:var(--accent-d)">📥 Import Lessons from Excel</div>
+    <div class="muted mb2">Upload an .xlsx / .xls file with lesson plan columns.</div>
+    <div class="file-zone" onclick="document.getElementById('xlsImport').click()" style="border-color:var(--accent)">
+      <div>📊 Select Excel file (.xlsx / .xls)</div>
+      <div class="muted" style="font-size:11px;margin-top:4px">THEME · STRAND · SUB-STRAND · SLO · SLE · KIQ · RESOURCES · ORGANISATION · INTRODUCTION · STEP 1–4 · CONCLUSION · EXTENDED · ASSESSMENT METHODS · REFLECTION · LESSON SKILL · WORK DONE</div>
+      <input type="file" id="xlsImport" accept=".xlsx,.xls" onchange="handleExcelImport(event)">
+    </div>
+    <div id="importPreview"></div>
+  </div>
+  <div class="card">
+    <div class="card-title flex-between" style="margin-bottom:0">
+      <span id="baseFormTitle">📝 New Lesson Record</span>
+      <button class="btn btn-ghost btn-sm" onclick="newBaseForm()">+ New</button>
+    </div>
+  </div>
+  <div class="card" id="bf-identification">
+    <div class="card-title">🗂 Lesson Identification</div>
+    <div class="form-grid">
+      <div class="form-group"><label class="fl">Grade</label>
+        <select id="b-grade" onchange="onBaseGradeChange()"><option value="">-- Select --</option><option value="7">Grade 7</option><option value="8">Grade 8</option><option value="9">Grade 9</option></select></div>
+      <div class="form-group"><label class="fl">Term</label>
+        <select id="b-term"><option value="">-- Select --</option><option value="1">Term 1</option><option value="2">Term 2</option><option value="3">Term 3</option></select></div>
+      <div class="form-group"><label class="fl">Week</label>
+        <select id="b-week"><option value="">-- Select --</option><option value="1">Week 1</option><option value="2">Week 2</option><option value="3">Week 3</option><option value="4">Week 4</option><option value="5">Week 5</option><option value="6">Week 6</option><option value="7">Week 7</option><option value="8">Week 8</option><option value="9">Week 9</option><option value="10">Week 10</option><option value="11">Week 11</option><option value="12">Week 12</option><option value="13">Week 13</option><option value="14">Week 14</option></select></div>
+      <div class="form-group"><label class="fl">Date</label><input type="date" id="b-date" onchange="onDateChange()"></div>
+      <div class="form-group"><label class="fl">Lesson No. (auto)</label><input type="text" id="b-lno" placeholder="e.g. L001"></div>
+      <div class="form-group"><label class="fl">Day (auto)</label><input type="text" id="b-day" readonly placeholder="From date"></div>
+      <div class="form-group"><label class="fl">Time (auto)</label><input type="text" id="b-time" readonly placeholder="From schedule"></div>
+      <div class="form-group"><label class="fl">Roll (auto)</label><input type="text" id="b-roll" readonly placeholder="From setup"></div>
+    </div>
+  </div>
+  <div class="card" id="bf-content">
+    <div class="card-title">📖 Content</div>
+    <div class="form-grid">
+      <div class="form-group"><label class="fl">Theme</label>
+        <select id="b-theme"><option value="">-- Select Grade First --</option></select></div>
+      <div class="form-group"><label class="fl">Strand</label>
+        <select id="b-strand"><option value="">-- Select Grade First --</option></select></div>
+      <div class="form-group full"><label class="fl">Sub-strand</label><input type="text" id="b-substrand" placeholder="Enter sub-strand"></div>
+    </div>
+  </div>
+  <div class="card" id="bf-outcomes">
+    <div class="card-title">🎯 Learning Outcomes &amp; Inquiry</div>
+    <div class="form-group mb2"><label class="fl">Specific Learning Outcomes (SLO)</label>
+      <div class="muted" style="font-size:11px;margin-bottom:4px">Press Enter to continue lettered points.</div>
+      <textarea class="tall" id="b-slo" oninput="autoResize(this)"></textarea></div>
+    <div class="form-group mb2"><label class="fl">Suggested Learning Experiences (SLE)</label>
+      <div class="muted" style="font-size:11px;margin-bottom:4px">Press Enter to continue bullet points.</div>
+      <textarea class="tall" id="b-sle" oninput="autoResize(this)"></textarea></div>
+    <div class="form-group"><label class="fl">Key Inquiry Question(s)</label>
+      <textarea id="b-kiq" oninput="autoResize(this)"></textarea></div>
+  </div>
+  <div class="card" id="bf-resources-card">
+    <div class="card-title">📦 Learning Resources</div>
+    <div class="muted mb1" style="font-size:11px">Press Enter to add each resource (~).</div>
+    <textarea id="b-resources" oninput="autoResize(this)"></textarea>
+  </div>
+  <div class="card" id="bf-orglearn">
+    <div class="card-title">🏫 Organisation of Learning</div>
+    <div class="form-group mb2"><label class="fl">Class Organisation / Approach</label>
+      <input type="text" id="b-orglearn" placeholder="e.g. Whole class, Pairs, Small groups"></div>
+    <div class="form-group"><label class="fl">Introduction</label>
+      <textarea class="tall" id="b-intro" oninput="autoResize(this)"></textarea></div>
+  </div>
+  <div class="card" id="bf-development">
+    <div class="card-title">🪜 Lesson Development</div>
+    <div class="muted mb2">Select steps, then describe each.</div>
+    <div class="step-selector">
+      <label class="step-lbl"><input type="checkbox" value="Step 1" onchange="toggleStep('step1',this)"> Step 1</label>
+      <label class="step-lbl"><input type="checkbox" value="Step 2" onchange="toggleStep('step2',this)"> Step 2</label>
+      <label class="step-lbl"><input type="checkbox" value="Step 3" onchange="toggleStep('step3',this)"> Step 3</label>
+      <label class="step-lbl"><input type="checkbox" value="Step 4" onchange="toggleStep('step4',this)"> Step 4</label>
+    </div>
+    <div id="step1" class="step-area" style="display:none"><h4>🔹 Step 1</h4><textarea id="b-step1" oninput="autoResize(this)"></textarea></div>
+    <div id="step2" class="step-area" style="display:none"><h4>🔹 Step 2</h4><textarea id="b-step2" oninput="autoResize(this)"></textarea></div>
+    <div id="step3" class="step-area" style="display:none"><h4>🔹 Step 3</h4><textarea id="b-step3" oninput="autoResize(this)"></textarea></div>
+    <div id="step4" class="step-area" style="display:none"><h4>🔹 Step 4</h4><textarea id="b-step4" oninput="autoResize(this)"></textarea></div>
+  </div>
+  <div class="card" id="bf-closing">
+    <div class="card-title">🔚 Closing Activities</div>
+    <div class="form-group mb2"><label class="fl">Extended Activities</label><textarea id="b-extended" oninput="autoResize(this)"></textarea></div>
+    <div class="form-group"><label class="fl">Conclusion</label><textarea id="b-conclusion" oninput="autoResize(this)"></textarea></div>
+  </div>
+  <div class="card" id="bf-reflection">
+    <div class="card-title">🪞 Reflection, Skills &amp; Assessment</div>
+    <div class="form-group mb2"><label class="fl">Reflection of the Lesson</label><textarea id="b-reflect" oninput="autoResize(this)"></textarea></div>
+    <div class="form-group mb2"><label class="fl">Lesson Skill Assessed</label>
+      <div class="muted" style="font-size:11px;margin-bottom:4px">Press Enter for roman numerals (i. ii. iii.)</div>
+      <textarea id="b-skill" oninput="autoResize(this)"></textarea></div>
+    <div class="form-group mb2"><label class="fl">Assessment Methods</label>
+      <textarea id="b-asm" placeholder="Observation, oral questioning, written work..." oninput="autoResize(this)"></textarea></div>
+    <div class="form-group"><label class="fl">Work Done</label>
+      <div class="muted" style="font-size:11px;margin-bottom:4px">Press Enter for list (i) ii) iii))</div>
+      <textarea id="b-workdone" oninput="autoResize(this)"></textarea></div>
+  </div>
+  <div class="card" id="bf-attainment">
+    <div class="card-title">📊 CBC Attainment Summary</div>
+    <div class="muted mb1">How many learners achieved each level for this lesson's assessed skill?</div>
+    <div class="att-grid">
+      <div class="att-box ee"><div class="att-label">EE</div><div class="att-desc">Exceeds Expectation</div><input type="number" id="b-att-ee" min="0" value="0" oninput="updateAttTotal()"></div>
+      <div class="att-box me"><div class="att-label">ME</div><div class="att-desc">Meets Expectation</div><input type="number" id="b-att-me" min="0" value="0" oninput="updateAttTotal()"></div>
+      <div class="att-box ae"><div class="att-label">AE</div><div class="att-desc">Approaching Expectation</div><input type="number" id="b-att-ae" min="0" value="0" oninput="updateAttTotal()"></div>
+      <div class="att-box be"><div class="att-label">BE</div><div class="att-desc">Below Expectation</div><input type="number" id="b-att-be" min="0" value="0" oninput="updateAttTotal()"></div>
+    </div>
+    <div class="att-total" id="attTotal"></div>
+  </div>
+  <div class="card" id="bf-materials">
+    <div class="card-title">📎 Digital Materials &amp; Evidence</div>
+    <div class="form-grid">
+      <div class="form-group full"><label class="fl">Prepared Digital Materials</label>
+        <div class="file-zone" onclick="document.getElementById('matFiles').click()"><div>📂 Click to upload materials</div>
+          <input type="file" id="matFiles" multiple onchange="handleFileUpload('mat',this)"></div>
+        <div class="file-list" id="matFileList"></div></div>
+      <div class="form-group full"><label class="fl">Digital Evidence</label>
+        <div class="file-zone" onclick="document.getElementById('evFiles').click()"><div>📸 Click to upload evidence</div>
+          <input type="file" id="evFiles" multiple onchange="handleFileUpload('ev',this)"></div>
+        <div class="file-list" id="evFileList"></div></div>
+    </div>
+    <div class="info-box mt1">⚠️ File names are stored; actual files are not. Keep originals safe.</div>
+  </div>
+  <div class="card">
+    <div class="btn-group">
+      <button class="btn btn-primary" onclick="saveBaseForm()">💾 Save Lesson Record</button>
+      <button class="btn btn-ghost" onclick="newBaseForm()">🔄 Clear Form</button>
+    </div>
+  </div>
+  <div class="card mt2">
+    <div class="card-title flex-between" style="margin-bottom:0">
+      <span>🗄 Saved Lesson Records</span><span id="lessonCount" class="badge bg-green"></span>
+    </div>
+    <div class="divider"></div>
+    <div class="flex mb2" style="gap:8px;flex-wrap:wrap">
+      <select id="dbFilterGrade" onchange="renderLessonsDB()" style="width:auto"><option value="">All Grades</option><option value="7">Grade 7</option><option value="8">Grade 8</option><option value="9">Grade 9</option></select>
+      <select id="dbFilterTerm" onchange="renderLessonsDB()" style="width:auto"><option value="">All Terms</option><option value="1">Term 1</option><option value="2">Term 2</option><option value="3">Term 3</option></select>
+      <div class="search-bar" style="flex:1;min-width:130px">
+        <span class="search-icon">🔍</span>
+        <input id="lessonSearch" type="text" placeholder="Search theme, strand..." oninput="renderLessonsDB()" style="padding-left:30px">
+      </div>
+    </div>
+    <div id="lessonsDB"></div>
+  </div>
+</div>
+
+<!-- LP -->
+<div id="tab-lp" class="tab-content">
+  <div class="card no-print">
+    <div class="card-title">📋 Lesson Plans</div>
+    <div class="flex mb2" style="gap:8px;flex-wrap:wrap">
+      <div class="form-group" style="min-width:110px"><label class="fl">Grade</label><select id="lp-grade" onchange="renderLP()"><option value="">All Grades</option><option value="7">Grade 7</option><option value="8">Grade 8</option><option value="9">Grade 9</option></select></div>
+      <div class="form-group" style="min-width:100px"><label class="fl">Term</label><select id="lp-term" onchange="renderLP()"><option value="">All Terms</option><option value="1">Term 1</option><option value="2">Term 2</option><option value="3">Term 3</option></select></div>
+      <div class="form-group" style="min-width:100px"><label class="fl">Week</label><select id="lp-week" onchange="renderLP()"><option value="">All Weeks</option><option value="1">Week 1</option><option value="2">Week 2</option><option value="3">Week 3</option><option value="4">Week 4</option><option value="5">Week 5</option><option value="6">Week 6</option><option value="7">Week 7</option><option value="8">Week 8</option><option value="9">Week 9</option><option value="10">Week 10</option><option value="11">Week 11</option><option value="12">Week 12</option><option value="13">Week 13</option><option value="14">Week 14</option></select></div>
+    </div>
+    <div class="share-bar">
+      <div class="share-bar-label">Export all filtered lessons</div>
+      <button class="btn btn-accent btn-sm" onclick="exportAllLPXls()">📊 All to Excel</button>
+      <button class="btn btn-outline btn-sm" onclick="shareAllLP()">📤 Share All</button>
+    </div>
+  </div>
+  <div id="lpList"></div>
+</div>
+
+<!-- SOW -->
+<div id="tab-sow" class="tab-content">
+  <div class="card no-print">
+    <div class="card-title">📊 Scheme of Work</div>
+    <div class="flex mb2" style="gap:8px;flex-wrap:wrap">
+      <div class="form-group" style="min-width:110px"><label class="fl">Grade</label><select id="sow-grade" onchange="renderSOW()"><option value="">All Grades</option><option value="7">Grade 7</option><option value="8">Grade 8</option><option value="9">Grade 9</option></select></div>
+      <div class="form-group" style="min-width:100px"><label class="fl">Term</label><select id="sow-term" onchange="renderSOW()"><option value="">All Terms</option><option value="1">Term 1</option><option value="2">Term 2</option><option value="3">Term 3</option></select></div>
+    </div>
+    <div class="share-bar">
+      <div class="share-bar-label">Actions</div>
+      <button class="btn btn-primary btn-sm" onclick="printSOW()">🖨 Print</button>
+      <button class="btn btn-accent btn-sm" onclick="exportSOWXls()">📊 Excel</button>
+      <button class="btn btn-outline btn-sm" onclick="shareSOW()">📤 Share</button>
+    </div>
+  </div>
+  <div id="sowDisplay"></div>
+</div>
+
+<!-- ROW -->
+<div id="tab-row" class="tab-content">
+  <div class="card no-print">
+    <div class="card-title">📔 Record of Work</div>
+    <div class="flex mb2" style="gap:8px;flex-wrap:wrap">
+      <div class="form-group" style="min-width:110px"><label class="fl">Grade</label><select id="row-grade" onchange="renderROW()"><option value="">All Grades</option><option value="7">Grade 7</option><option value="8">Grade 8</option><option value="9">Grade 9</option></select></div>
+      <div class="form-group" style="min-width:100px"><label class="fl">Term</label><select id="row-term" onchange="renderROW()"><option value="">All Terms</option><option value="1">Term 1</option><option value="2">Term 2</option><option value="3">Term 3</option></select></div>
+      <div class="form-group" style="min-width:100px"><label class="fl">Week</label><select id="row-week" onchange="renderROW()"><option value="">All Weeks</option><option value="1">Week 1</option><option value="2">Week 2</option><option value="3">Week 3</option><option value="4">Week 4</option><option value="5">Week 5</option><option value="6">Week 6</option><option value="7">Week 7</option><option value="8">Week 8</option><option value="9">Week 9</option><option value="10">Week 10</option><option value="11">Week 11</option><option value="12">Week 12</option><option value="13">Week 13</option><option value="14">Week 14</option></select></div>
+    </div>
+    <div class="share-bar">
+      <div class="share-bar-label">Actions</div>
+      <button class="btn btn-primary btn-sm" onclick="printROW()">🖨 Print</button>
+      <button class="btn btn-accent btn-sm" onclick="exportROWXls()">📊 Excel</button>
+      <button class="btn btn-outline btn-sm" onclick="shareROW()">📤 Share</button>
+    </div>
+  </div>
+  <div id="rowDisplay"></div>
+</div>
+
+<!-- IEP -->
+<div id="tab-iep" class="tab-content">
+  <div class="card">
+    <div class="card-title flex-between" style="margin-bottom:0">
+      <span id="iepFormTitle">🎯 New IEP</span>
+      <button class="btn btn-ghost btn-sm" onclick="newIEPForm()">+ New IEP</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">👤 Learner Details</div>
+    <div class="form-grid">
+      <div class="form-group full"><label class="fl">Learner Full Name</label><input id="iep-name" type="text" placeholder="Full name"></div>
+      <div class="form-group"><label class="fl">Admission No.</label><input id="iep-adm" type="text" placeholder="Adm. number"></div>
+      <div class="form-group"><label class="fl">Grade</label>
+        <select id="iep-grade"><option value="">-- Select --</option><option value="7">Grade 7</option><option value="8">Grade 8</option><option value="9">Grade 9</option></select></div>
+      <div class="form-group"><label class="fl">Term</label>
+        <select id="iep-term"><option value="">--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
+      <div class="form-group"><label class="fl">Date of Birth</label><input id="iep-dob" type="date"></div>
+      <div class="form-group"><label class="fl">Parent / Guardian</label><input id="iep-parent" type="text" placeholder="Name"></div>
+      <div class="form-group"><label class="fl">Parent Contact</label><input id="iep-contact" type="text" placeholder="Phone"></div>
+      <div class="form-group"><label class="fl">Date of IEP</label><input id="iep-date" type="date"></div>
+      <div class="form-group"><label class="fl">Review Date</label><input id="iep-review" type="date"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">🔍 Identified Support Needs</div>
+    <div class="form-group mb2"><label class="fl">Nature of Identified Learning Challenges</label><textarea class="tall" id="iep-challenges" oninput="autoResize(this)"></textarea></div>
+    <div class="form-group"><label class="fl">Area(s) of Strength</label><textarea id="iep-strengths" oninput="autoResize(this)"></textarea></div>
+  </div>
+  <div class="card">
+    <div class="card-title">🎯 Goals &amp; Strategies</div>
+    <div class="form-group mb2"><label class="fl">Specific Learning Goals for the Term</label><textarea class="tall" id="iep-goals" oninput="autoResize(this)"></textarea></div>
+    <div class="form-group mb2"><label class="fl">Support Strategies / Interventions</label><textarea class="tall" id="iep-strategies" oninput="autoResize(this)"></textarea></div>
+    <div class="form-group"><label class="fl">Assessment / Monitoring Methods</label><textarea id="iep-assessment" oninput="autoResize(this)"></textarea></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📈 Progress &amp; Remarks</div>
+    <div class="form-group mb2"><label class="fl">Progress Notes</label><textarea class="tall" id="iep-progress" oninput="autoResize(this)"></textarea></div>
+    <div class="form-group mb2"><label class="fl">Teacher Remarks</label><textarea id="iep-remarks" oninput="autoResize(this)"></textarea></div>
+    <div class="form-group"><label class="fl">Parent / Guardian Remarks</label><textarea id="iep-parentremarks" oninput="autoResize(this)"></textarea></div>
+  </div>
+  <div class="card">
+    <div class="btn-group">
+      <button class="btn btn-primary" onclick="saveIEP()">💾 Save IEP</button>
+      <button class="btn btn-ghost" onclick="newIEPForm()">🔄 Clear</button>
+    </div>
+  </div>
+  <div class="card mt2">
+    <div class="card-title flex-between" style="margin-bottom:0">
+      <span>🗄 Saved IEPs</span><span id="iepCount" class="badge bg-blue"></span>
+    </div>
+    <div class="divider"></div>
+    <div class="flex mb2" style="gap:8px;flex-wrap:wrap">
+      <select id="iepFilterGrade" onchange="renderIEPDB()" style="width:auto"><option value="">All Grades</option><option value="7">Grade 7</option><option value="8">Grade 8</option><option value="9">Grade 9</option></select>
+      <select id="iepFilterTerm" onchange="renderIEPDB()" style="width:auto"><option value="">All Terms</option><option value="1">Term 1</option><option value="2">Term 2</option><option value="3">Term 3</option></select>
+    </div>
+    <div class="share-bar mb2">
+      <div class="share-bar-label">Actions on all filtered IEPs</div>
+      <button class="btn btn-primary btn-sm" onclick="printAllIEPs()">🖨 Print All</button>
+      <button class="btn btn-accent btn-sm" onclick="exportAllIEPXls()">📊 Export Excel</button>
+      <button class="btn btn-outline btn-sm" onclick="shareAllIEPs()">📤 Share All</button>
+    </div>
+    <div id="iepDB"></div>
+  </div>
+</div>
+
+<!-- PLANNER -->
+<div id="tab-planner" class="tab-content">
+  <div class="card">
+    <div class="card-title">📅 Term Lesson Planner</div>
+    <div class="flex mb2" style="gap:8px;flex-wrap:wrap">
+      <div class="form-group" style="min-width:110px"><label class="fl">Grade</label><select id="planner-grade" onchange="renderPlanner()"><option value="">All Grades</option><option value="7">Grade 7</option><option value="8">Grade 8</option><option value="9">Grade 9</option></select></div>
+      <div class="form-group" style="min-width:100px"><label class="fl">Term</label><select id="planner-term" onchange="renderPlanner()"><option value="">All Terms</option><option value="1">Term 1</option><option value="2">Term 2</option><option value="3">Term 3</option></select></div>
+    </div>
+    <div class="info-box mb2">🎨 <b style="color:var(--g7t)">■ Grade 7</b> &nbsp;<b style="color:var(--g8t)">■ Grade 8</b> &nbsp;<b style="color:var(--g9t)">■ Grade 9</b> · Tap any chip to edit that lesson.</div>
+  </div>
+  <div class="card" style="overflow-x:auto;padding:10px"><div id="plannerGrid"></div></div>
+</div>
+
+<!-- CAL -->
+<div id="tab-cal" class="tab-content">
+  <div class="card">
+    <div class="card-title">🎓 Continuous Assessment Log (CAL)</div>
+    <div class="muted mb2">Record individual learner attainment levels per skill or outcome.</div>
+    <div class="form-grid">
+      <div class="form-group"><label class="fl">Grade</label>
+        <select id="cal-grade"><option value="">-- Select --</option><option value="7">Grade 7</option><option value="8">Grade 8</option><option value="9">Grade 9</option></select></div>
+      <div class="form-group"><label class="fl">Term</label>
+        <select id="cal-term"><option value="">--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
+      <div class="form-group"><label class="fl">Learner Name</label><input id="cal-learner" type="text" placeholder="Full name"></div>
+      <div class="form-group"><label class="fl">Attainment Level</label>
+        <select id="cal-level"><option value="">-- Select --</option><option value="EE">EE – Exceeds Expectation</option><option value="ME">ME – Meets Expectation</option><option value="AE">AE – Approaching Expectation</option><option value="BE">BE – Below Expectation</option></select></div>
+      <div class="form-group"><label class="fl">Skill / Outcome Assessed</label><input id="cal-skill" type="text" placeholder="e.g. Listening comprehension"></div>
+      <div class="form-group"><label class="fl">Date</label><input id="cal-date" type="date"></div>
+      <div class="form-group full"><label class="fl">Notes (optional)</label><input id="cal-notes" type="text" placeholder="Additional observation..."></div>
+    </div>
+    <button class="btn btn-primary mt2" onclick="saveCALEntry()">➕ Add Entry</button>
+  </div>
+  <div class="card">
+    <div class="card-title flex-between" style="margin-bottom:0">
+      <span>📋 CAL Records</span><span id="calCount" class="badge bg-green"></span>
+    </div>
+    <div class="divider"></div>
+    <div class="flex mb2" style="gap:8px;flex-wrap:wrap">
+      <select id="calFilterGrade" onchange="renderCALTable()" style="width:auto"><option value="">All Grades</option><option value="7">Grade 7</option><option value="8">Grade 8</option><option value="9">Grade 9</option></select>
+      <select id="calFilterTerm" onchange="renderCALTable()" style="width:auto"><option value="">All Terms</option><option value="1">Term 1</option><option value="2">Term 2</option><option value="3">Term 3</option></select>
+      <select id="calFilterLevel" onchange="renderCALTable()" style="width:auto">
+        <option value="">All Levels</option><option value="EE">EE</option><option value="ME">ME</option><option value="AE">AE</option><option value="BE">BE</option>
+      </select>
+      <button class="btn btn-accent btn-sm" onclick="exportCALXls()">📊 Export Excel</button>
+    </div>
+    <div id="calList"></div>
+  </div>
+</div>
+
+<!-- REPORTS -->
+<div id="tab-reports" class="tab-content">
+  <div class="card">
+    <div class="card-title">📈 Term Report &amp; Analytics</div>
+    <div class="flex mb2" style="gap:8px;flex-wrap:wrap">
+      <div class="form-group" style="min-width:110px"><label class="fl">Grade</label><select id="rpt-grade" onchange="generateReport()"><option value="">All Grades</option><option value="7">Grade 7</option><option value="8">Grade 8</option><option value="9">Grade 9</option></select></div>
+      <div class="form-group" style="min-width:100px"><label class="fl">Term</label><select id="rpt-term" onchange="generateReport()"><option value="">All Terms</option><option value="1">Term 1</option><option value="2">Term 2</option><option value="3">Term 3</option></select></div>
+    </div>
+  </div>
+  <div id="reportOutput"></div>
+</div>
+
+<button id="scrollTopBtn" class="scroll-top-btn" title="Back to top">🔼</button>
+
+<script>
+
+// AUTH
+function doLogin(){
+  var u=document.getElementById('loginUser').value.trim().toUpperCase();
+  var p=document.getElementById('loginPass').value;
+  var err=document.getElementById('loginErr');
+  if(u==='SOBE'&&p==='sobe6115'){
+    sessionStorage.setItem('tpds_auth','1');
+    document.getElementById('loginOverlay').style.display='none';
+    switchTab('home');
+  } else {
+    err.textContent='Invalid username or password.';
+    var box=document.getElementById('loginBox');
+    box.classList.remove('shake');void box.offsetWidth;box.classList.add('shake');
+    setTimeout(function(){err.textContent='';},3000);
+  }
+}
+function doLogout(){if(!confirm('Sign out?'))return;sessionStorage.removeItem('tpds_auth');location.reload();}
+
+// DARK MODE
+function toggleDark(){var on=document.documentElement.classList.toggle('dark');localStorage.setItem('tpds_dark',on?'1':'0');document.getElementById('darkBtn').textContent=on?'☀️':'🌙';}
+function applyDark(){var on=localStorage.getItem('tpds_dark')==='1';if(on)document.documentElement.classList.add('dark');var btn=document.getElementById('darkBtn');if(btn)btn.textContent=on?'☀️':'🌙';}
+
+// STORAGE
+var SK={setup:'eng_tpds_setup',lessons:'eng_tpds_lessons',ieps:'eng_tpds_ieps',deleted:'eng_tpds_deleted',cal:'eng_tpds_cal'};
+var DEF_STR={7:['Listening and Speaking','Reading','Writing','Grammar','Literature'],8:['Listening and Speaking','Reading','Writing','Grammar','Literature'],9:['Listening and Speaking','Reading','Writing','Grammar','Literature']};
+var DEF={school:'',subject:'English',teacher:'',tsc:'',contact:'',signature:'',academicYear:String(new Date().getFullYear()),grades:[7,8,9],schedule:[],rolls:{7:'',8:'',9:''},themes:{7:[],8:[],9:[]},strands:{7:['Listening and Speaking','Reading','Writing','Grammar','Literature'],8:['Listening and Speaking','Reading','Writing','Grammar','Literature'],9:['Listening and Speaking','Reading','Writing','Grammar','Literature']}};
+
+function getSetup(){
+  try{
+    var s=JSON.parse(localStorage.getItem(SK.setup))||JSON.parse(JSON.stringify(DEF));
+    if(Array.isArray(s.strands)){var a=s.strands;s.strands={7:a.slice(),8:a.slice(),9:a.slice()};}
+    if(!s.strands||Array.isArray(s.strands)||typeof s.strands!=='object'){s.strands=JSON.parse(JSON.stringify(DEF_STR));}
+    return s;
+  }catch(e){return JSON.parse(JSON.stringify(DEF));}
+}
+function saveSetupData(d){localStorage.setItem(SK.setup,JSON.stringify(d));}
+function getLessons(){try{return JSON.parse(localStorage.getItem(SK.lessons))||[];}catch(e){return[];}}
+function saveLessonsData(a){localStorage.setItem(SK.lessons,JSON.stringify(a));}
+function getIEPs(){try{return JSON.parse(localStorage.getItem(SK.ieps))||[];}catch(e){return[];}}
+function saveIEPsData(a){localStorage.setItem(SK.ieps,JSON.stringify(a));}
+function getDeletedBin(){try{return JSON.parse(localStorage.getItem(SK.deleted))||[];}catch(e){return[];}}
+function saveDeletedBin(a){localStorage.setItem(SK.deleted,JSON.stringify(a));}
+function getCAL(){try{return JSON.parse(localStorage.getItem(SK.cal))||[];}catch(e){return[];}}
+function saveCAL(a){localStorage.setItem(SK.cal,JSON.stringify(a));}
+function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+function calcStorage(){var t=0;try{for(var k in localStorage){if(Object.prototype.hasOwnProperty.call(localStorage,k))t+=(localStorage[k].length+k.length)*2;}}catch(e){}return t;}
+
+// STATE
+var STATE={currentTab:'home',editingLessonId:null,editingIEPId:null,themeGrade:7,strandGrade:7,matFiles:[],evFiles:[],sigDrawing:false,sigLX:0,sigLY:0,importedRows:[],pendingImportTheme:null,pendingImportStrand:null,formDirty:false,stepperObs:null};
+function setDirty(){STATE.formDirty=true;}
+function clearDirty(){STATE.formDirty=false;}
+
+// NAV
+function switchTab(name){
+  if(STATE.formDirty&&STATE.currentTab==='base'&&name!=='base'){if(!confirm('Unsaved changes. Leave?'))return;clearDirty();}
+  STATE.currentTab=name;
+  document.querySelectorAll('.tab-content').forEach(function(e){e.classList.remove('active');});
+  document.querySelectorAll('.tab-btn').forEach(function(e){e.classList.remove('active');});
+  var el=document.getElementById('tab-'+name);if(el)el.classList.add('active');
+  var btns=document.querySelectorAll('.tab-btn');
+  var map={home:0,setup:1,base:2,lp:3,sow:4,row:5,iep:6,planner:7,cal:8,reports:9};
+  if(map[name]!==undefined&&btns[map[name]])btns[map[name]].classList.add('active');
+  var st=document.getElementById('bfStepper');if(st)st.classList.toggle('visible',name==='base');
+  if(name==='home')initHomeTab();if(name==='setup')initSetupTab();if(name==='base')initBaseTab();
+  if(name==='lp')renderLP();if(name==='sow')renderSOW();if(name==='row')renderROW();if(name==='iep')initIEPTab();
+  if(name==='planner')renderPlanner();if(name==='cal')renderCALTable();if(name==='reports')generateReport();
+  updateHeader();window.scrollTo({top:0,behavior:'smooth'});
+}
+function updateHeader(){
+  var s=getSetup();
+  document.getElementById('hdrSchool').textContent=s.school||'Teacher Professional Documents System';
+  document.getElementById('hdrTeacher').innerHTML=s.teacher?('<b>'+escHtml(s.teacher)+'</b><br>'+escHtml(s.subject||'English')+' · '+(s.academicYear||'')):'';
+}
+
+// NOTIFY
+function notify(msg,type){type=type||'ok';var d=document.createElement('div');d.className='notif '+(type==='err'?'err':'ok');d.innerHTML=(type==='ok'?'✅ ':type==='err'?'❌ ':'ℹ️ ')+msg;document.body.appendChild(d);setTimeout(function(){d.remove();},3500);}
+
+// HOME
+function initHomeTab(){
+  cleanDeletedBin();
+  var lessons=getLessons();var ieps=getIEPs();
+  var stats=[{num:lessons.length,lbl:'Total Lessons'},{num:[...new Set(lessons.map(function(l){return l.grade;}).filter(Boolean))].length,lbl:'Grades Active'},{num:[...new Set(lessons.map(function(l){return l.term;}).filter(Boolean))].length,lbl:'Terms Covered'},{num:ieps.length,lbl:'IEPs'}];
+  document.getElementById('homeStats').innerHTML=stats.map(function(s){return '<div class="stat-card"><div class="stat-num">'+s.num+'</div><div class="stat-lbl">'+s.lbl+'</div></div>';}).join('');
+  var gp=document.getElementById('gradeProgress');
+  if(gp)gp.innerHTML=[7,8,9].map(function(g){
+    var cnt=lessons.filter(function(l){return+l.grade===g;}).length;
+    var wks=[...new Set(lessons.filter(function(l){return+l.grade===g;}).map(function(l){return l.term&&l.week?l.term+'-'+l.week:null;}).filter(Boolean))].length;
+    var pct=Math.min(100,Math.round(wks/28*100));var roll=getSetup().rolls[g]||'–';
+    return '<div style="margin-bottom:10px"><div class="flex-between mb1" style="font-size:.82rem"><span><b>Grade '+g+'</b> <span class="badge bg-gray">'+roll+' learners</span></span><span style="color:var(--muted)">'+cnt+' lessons · '+pct+'%</span></div><div class="progress-bar"><div class="progress-fill '+(pct<40?'danger':pct<70?'warn':'')+'" style="width:'+pct+'%"></div></div></div>';
+  }).join('');
+  var ir=document.getElementById('iepReminders');
+  if(ir){var today=new Date();today.setHours(0,0,0,0);var alerts=ieps.filter(function(x){if(!x.review)return false;var rv=new Date(x.review);rv.setHours(0,0,0,0);return Math.floor((rv-today)/86400000)<=7;});
+    ir.innerHTML=alerts.length?alerts.map(function(x){var rv=new Date(x.review);rv.setHours(0,0,0,0);var d=Math.floor((rv-today)/86400000);var ov=d<0;return '<div class="reminder-card '+(ov?'':'warn')+'"><div><b>'+escHtml(x.name)+'</b> <span class="badge bg-blue">Gr'+x.grade+'</span><br><span class="muted" style="font-size:.75rem">'+(ov?'⚠️ Overdue '+Math.abs(d)+'d':'📅 Review in '+d+'d ('+x.review+')')+'</span></div><button class="btn btn-outline btn-xs" onclick="switchTab(\'iep\');editIEP(\''+x.id+'\')">Open</button></div>';}).join(''):'<div class="muted">No IEP reviews due within 7 days ✅</div>';
+  }
+  var bin=getDeletedBin();var dbs=document.getElementById('deletedBinSection');
+  if(dbs){dbs.style.display=bin.length?'block':'none';var dl=document.getElementById('deletedList');if(dl)dl.innerHTML=bin.map(function(e){return '<div class="deleted-card"><span>Gr'+(e.lesson.grade||'?')+' · '+escHtml(e.lesson.theme||'No theme')+' · <em>'+timeSince(e.deletedAt)+'</em></span><button class="btn btn-outline btn-xs" onclick="restoreLesson(\''+e.lesson.id+'\')">↩ Restore</button></div>';}).join('');}
+  var sm=document.getElementById('storageMeter');var sl=document.getElementById('storageLabel');
+  if(sm){var used=calcStorage();var maxSz=5*1024*1024;var pct=Math.min(100,Math.round(used/maxSz*100));var kb=(used/1024).toFixed(1);sm.innerHTML='<div class="storage-meter"><div class="storage-fill '+(pct>80?'danger':pct>60?'warn':'')+'" style="width:'+pct+'%"></div></div>';if(sl)sl.textContent=kb+' KB used of ~5 MB ('+pct+'%)';}
+  var recent=lessons.slice().sort(function(a,b){return b.updatedAt-a.updatedAt;}).slice(0,5);
+  document.getElementById('homeRecentLessons').innerHTML=recent.length?recent.map(function(l){return '<div class="lsn-card" data-grade="'+l.grade+'"><div class="lsn-info"><div class="lsn-title">Gr'+(l.grade||'?')+' · '+escHtml(l.theme||'No theme')+' · '+escHtml(l.strand||'–')+'</div><div class="lsn-meta">T'+(l.term||'?')+' W'+(l.week||'?')+' | '+(l.date||'')+' | '+escHtml(l.substrand||'')+'</div></div><div class="lsn-actions"><button class="btn btn-outline btn-xs" onclick="switchTab(\'base\');editLesson(\''+l.id+'\')">Edit</button></div></div>';}).join(''):'<div class="empty"><div class="empty-icon">📝</div><div>No lessons yet.</div><button class="btn btn-primary mt2" onclick="switchTab(\'base\')">➕ Create First Lesson</button></div>';
+}
+function timeSince(ts){var s=Math.floor((Date.now()-ts)/1000);if(s<60)return s+'s ago';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago';}
+function exportBackup(){var d={setup:getSetup(),lessons:getLessons(),ieps:getIEPs(),cal:getCAL(),exportedAt:new Date().toISOString(),version:'3.1'};var blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='TPDS_Backup_'+new Date().toISOString().slice(0,10)+'.json';a.click();notify('Backup exported!');}
+function importBackup(e){var file=e.target.files[0];if(!file)return;var r=new FileReader();r.onload=function(ev){try{var d=JSON.parse(ev.target.result);if(!confirm('Replace ALL current data?'))return;if(d.setup)saveSetupData(d.setup);if(d.lessons)saveLessonsData(d.lessons);if(d.ieps)saveIEPsData(d.ieps);if(d.cal)saveCAL(d.cal);notify('Backup restored!');updateHeader();initHomeTab();}catch(ex){notify('Invalid backup file.','err');}};r.readAsText(file);e.target.value='';}
+
+// SETUP
+function initSetupTab(){
+  var s=getSetup();function sv(id,v){var el=document.getElementById(id);if(el)el.value=v||'';}
+  sv('s-school',s.school);sv('s-subject',s.subject||'English');sv('s-teacher',s.teacher);sv('s-tsc',s.tsc);sv('s-contact',s.contact);sv('s-year',s.academicYear||String(new Date().getFullYear()));
+  [7,8,9].forEach(function(g){var el=document.getElementById('g'+g);if(el)el.checked=(s.grades||[]).includes(g);});
+  renderScheduleList();renderRollList();setThemeGrade(STATE.themeGrade);setStrandGrade(STATE.strandGrade);
+  initSigPad();
+  if(s.signature){var ctx=document.getElementById('sigCanvas').getContext('2d');var img=new Image();img.onload=function(){ctx.drawImage(img,0,0);};img.src=s.signature;}
+}
+function renderScheduleList(){
+  var s=getSetup();var list=document.getElementById('scheduleList');list.innerHTML='';
+  (s.schedule||[]).forEach(function(row,i){
+    var days=['Monday','Tuesday','Wednesday','Thursday','Friday'];
+    var dayOpts=days.map(function(d){return '<option value="'+d+'"'+(row.day===d?' selected':'')+'>'+d+'</option>';}).join('');
+    var gradeOpts=[7,8,9].map(function(g){return '<option value="'+g+'"'+(row.grade==g?' selected':'')+'>'+'Grade '+g+'</option>';}).join('');
+    var el=document.createElement('div');el.className='dyn-row sched-row';
+    el.innerHTML='<select onchange="updateScheduleRow('+i+',\'day\',this.value)">'+dayOpts+'</select><select onchange="updateScheduleRow('+i+',\'grade\',this.value)"><option value="">Gr</option>'+gradeOpts+'</select><input type="time" value="'+(row.timeFrom||'')+'" onchange="updateScheduleRow('+i+',\'timeFrom\',this.value)"><input type="time" value="'+(row.timeTo||'')+'" onchange="updateScheduleRow('+i+',\'timeTo\',this.value)"><button class="remove-btn" onclick="removeScheduleRow('+i+')">✕</button>';
+    list.appendChild(el);
+  });
+}
+function addScheduleRow(){var s=getSetup();s.schedule.push({day:'Monday',grade:7,timeFrom:'',timeTo:''});saveSetupData(s);renderScheduleList();}
+function removeScheduleRow(i){var s=getSetup();s.schedule.splice(i,1);saveSetupData(s);renderScheduleList();}
+function updateScheduleRow(i,f,v){var s=getSetup();s.schedule[i][f]=(f==='grade'?parseInt(v):v);saveSetupData(s);}
+function renderRollList(){var s=getSetup();var list=document.getElementById('rollList');list.innerHTML='';[7,8,9].forEach(function(g){var el=document.createElement('div');el.className='dyn-row roll-row-grid';el.innerHTML='<span style="font-size:13px;font-weight:600;color:var(--primary)">Grade '+g+'</span><input type="number" min="0" max="60" value="'+(s.rolls[g]||'')+'" placeholder="No. learners" onchange="updateRoll('+g+',this.value)"><span></span>';list.appendChild(el);});}
+function updateRoll(g,v){var s=getSetup();s.rolls[g]=v;saveSetupData(s);}
+
+// THEMES – grade-specific
+function setThemeGrade(g,btn){STATE.themeGrade=parseInt(g);document.querySelectorAll('#themeGradeTabs .grade-tab').forEach(function(b){b.classList.remove('active');});if(btn)btn.classList.add('active');else{var btns=document.querySelectorAll('#themeGradeTabs .grade-tab');var idx=g-7;if(btns[idx])btns[idx].classList.add('active');}renderThemeChips();}
+function renderThemeChips(){var s=getSetup();var themes=s.themes[STATE.themeGrade]||[];var el=document.getElementById('themeChips');el.innerHTML=themes.length?themes.map(function(t,i){return '<span class="theme-chip">'+escHtml(t)+'<button onclick="removeTheme('+i+')">✕</button></span>';}).join(''):'<span class="muted">No themes yet.</span>';}
+function addTheme(){var inp=document.getElementById('themeInput');var v=inp.value.trim();if(!v)return;var s=getSetup();if(!s.themes[STATE.themeGrade])s.themes[STATE.themeGrade]=[];s.themes[STATE.themeGrade].push(v);saveSetupData(s);inp.value='';renderThemeChips();}
+function removeTheme(i){var s=getSetup();s.themes[STATE.themeGrade].splice(i,1);saveSetupData(s);renderThemeChips();}
+
+// STRANDS – now grade-specific (mirrors themes pattern)
+function setStrandGrade(g,btn){STATE.strandGrade=parseInt(g);document.querySelectorAll('#strandGradeTabs .grade-tab').forEach(function(b){b.classList.remove('active');});if(btn)btn.classList.add('active');else{var btns=document.querySelectorAll('#strandGradeTabs .grade-tab');var idx=g-7;if(btns[idx])btns[idx].classList.add('active');}renderStrandList();}
+function renderStrandList(){var s=getSetup();var strands=s.strands[STATE.strandGrade]||[];var list=document.getElementById('strandList');list.innerHTML=strands.length?strands.map(function(st,i){return '<div class="strand-row"><span>'+escHtml(st)+'</span><button class="remove-btn" onclick="removeStrand('+i+')">✕</button></div>';}).join(''):'<span class="muted">No strands for Grade '+STATE.strandGrade+' yet.</span>';}
+function addStrand(){var inp=document.getElementById('strandInput');var v=inp.value.trim();if(!v)return;var s=getSetup();if(!s.strands[STATE.strandGrade])s.strands[STATE.strandGrade]=[];s.strands[STATE.strandGrade].push(v);saveSetupData(s);inp.value='';renderStrandList();}
+function removeStrand(i){var s=getSetup();s.strands[STATE.strandGrade].splice(i,1);saveSetupData(s);renderStrandList();}
+
+function saveSetupAll(){
+  var s=getSetup();s.school=document.getElementById('s-school').value.trim();s.subject=document.getElementById('s-subject').value.trim()||'English';s.teacher=document.getElementById('s-teacher').value.trim();s.tsc=document.getElementById('s-tsc').value.trim();s.contact=document.getElementById('s-contact').value.trim();s.academicYear=document.getElementById('s-year').value.trim();
+  s.grades=[7,8,9].filter(function(g){var el=document.getElementById('g'+g);return el&&el.checked;});
+  var canvas=document.getElementById('sigCanvas');if(canvas)s.signature=canvas.toDataURL();
+  saveSetupData(s);updateHeader();notify('Setup saved!');
+}
+function resetSetup(){if(!confirm('Reset setup? Lesson records unaffected.'))return;saveSetupData(JSON.parse(JSON.stringify(DEF)));initSetupTab();notify('Setup reset.');}
+
+// SIG PAD
+function initSigPad(){var canvas=document.getElementById('sigCanvas');if(!canvas||canvas._inited)return;canvas._inited=true;canvas.width=canvas.offsetWidth||380;canvas.height=130;var ctx=canvas.getContext('2d');ctx.strokeStyle='#1b4332';ctx.lineWidth=2;ctx.lineCap='round';ctx.lineJoin='round';function pos(e){var r=canvas.getBoundingClientRect();var src=e.touches?e.touches[0]:e;return{x:(src.clientX-r.left)*(canvas.width/r.width),y:(src.clientY-r.top)*(canvas.height/r.height)};}function start(e){e.preventDefault();STATE.sigDrawing=true;var p=pos(e);STATE.sigLX=p.x;STATE.sigLY=p.y;ctx.beginPath();ctx.moveTo(p.x,p.y);}function draw(e){e.preventDefault();if(!STATE.sigDrawing)return;var p=pos(e);ctx.beginPath();ctx.moveTo(STATE.sigLX,STATE.sigLY);ctx.lineTo(p.x,p.y);ctx.stroke();STATE.sigLX=p.x;STATE.sigLY=p.y;}function stop(){STATE.sigDrawing=false;}canvas.addEventListener('mousedown',start);canvas.addEventListener('mousemove',draw);canvas.addEventListener('mouseup',stop);canvas.addEventListener('mouseleave',stop);canvas.addEventListener('touchstart',start,{passive:false});canvas.addEventListener('touchmove',draw,{passive:false});canvas.addEventListener('touchend',stop);}
+function clearSig(){var c=document.getElementById('sigCanvas');if(!c)return;c.getContext('2d').clearRect(0,0,c.width,c.height);var s=getSetup();s.signature='';saveSetupData(s);}
+
+// EXCEL IMPORT
+function normalizeKey(k){return String(k).trim().toLowerCase().replace(/[\s()/\-.]+/g,'');}
+function mapRow(row){var km={theme:'theme',strand:'strand',substrand:'substrand',substand:'substrand',specificlearningoutcomes:'slo',specificlearningoutcome:'slo',suggestlearningexperiences:'sle',suggestedlearningexperiences:'sle',selectedlearningexperiences:'sle',learningexperiences:'sle',keyinquiryquestions:'kiq',keyinquiryquestion:'kiq',keyinquiryquestionss:'kiq',learningresources:'resources',resources:'resources',organisationoflearning:'orglearn',organizationoflearning:'orglearn',organisation:'orglearn',introduction:'intro',step1:'step1',step2:'step2',step3:'step3',step4:'step4',lessondevelopmentstep1:'step1',lessondevelopmentstep2:'step2',lessondevelopmentstep3:'step3',lessondevelopmentstep4:'step4',conclusion:'conclusion',extendedactivities:'extended',extended:'extended',assessmentmethods:'asm',assessment:'asm',reflection:'reflect',lessonskill:'skill',skill:'skill',workdone:'workdone'};var m={};Object.entries(row).forEach(function(pair){var n=normalizeKey(pair[0]);var f=km[n];if(f&&pair[1]!==null&&pair[1]!==undefined&&String(pair[1]).trim()&&!m[f])m[f]=String(pair[1]);});return m;}
+function handleExcelImport(e){var file=e.target.files[0];if(!file)return;if(typeof XLSX==='undefined'){notify('SheetJS not loaded – check internet.','err');return;}var r=new FileReader();r.onload=function(ev){try{var wb=XLSX.read(ev.target.result,{type:'binary'});var ws=wb.Sheets[wb.SheetNames[0]];var data=XLSX.utils.sheet_to_json(ws,{defval:''});if(!data.length){notify('No data found.','err');return;}STATE.importedRows=data.map(mapRow);renderImportPreview(STATE.importedRows);notify(data.length+' row(s) loaded.');}catch(err){notify('Could not read: '+err.message,'err');}};r.readAsBinaryString(file);e.target.value='';}
+function renderImportPreview(rows){var prev=document.getElementById('importPreview');if(!rows||!rows.length){prev.innerHTML='';return;}prev.innerHTML='<div class="import-banner mt2"><b>📋 '+rows.length+' row(s) ready.</b> → Load fills the form; Import All saves all.</div><div class="flex-between mt2 mb1"><span class="section-head" style="margin:0">Preview</span><button class="btn btn-success btn-sm" onclick="importAllRows()">⬆️ Import All ('+rows.length+')</button></div><div class="tbl-wrap" style="max-height:260px;overflow-y:auto"><table class="import-preview-tbl"><thead><tr><th>#</th><th>Theme</th><th>Strand</th><th>Sub-strand</th><th>SLO</th><th></th></tr></thead><tbody>'+rows.map(function(r,i){return '<tr><td>'+(i+1)+'</td><td title="'+escHtml(r.theme||'')+'">'+escHtml((r.theme||'–').substring(0,28))+'</td><td>'+escHtml((r.strand||'–').substring(0,18))+'</td><td>'+escHtml((r.substrand||'–').substring(0,22))+'</td><td>'+escHtml((r.slo||'–').substring(0,45))+((r.slo||'').length>45?'…':'')+'</td><td><button class="btn btn-outline btn-xs" onclick="loadImportedRow('+i+')">→ Load</button></td></tr>';}).join('')+'</tbody></table></div>';}
+function loadImportedRow(idx){var row=STATE.importedRows[idx];if(!row)return;function sv(id,v){var el=document.getElementById(id);if(el&&v!==undefined&&v!=='')el.value=v;}sv('b-substrand',row.substrand);sv('b-slo',row.slo||'By the end of the lesson, the learner should be able to:\na) ');sv('b-sle',row.sle||'The learner is guided to:\n• ');sv('b-kiq',row.kiq||'1. ');sv('b-resources',row.resources||'~ ');sv('b-orglearn',row.orglearn);sv('b-intro',row.intro);sv('b-step1',row.step1);sv('b-step2',row.step2);sv('b-step3',row.step3);sv('b-step4',row.step4);sv('b-conclusion',row.conclusion);sv('b-extended',row.extended);sv('b-reflect',row.reflect);sv('b-skill',row.skill||'i. ');sv('b-workdone',row.workdone||'i) ');sv('b-asm',row.asm||'');['step1','step2','step3','step4'].forEach(function(sid,i){var v=row[sid];var el=document.getElementById(sid);var cb=document.querySelector('.step-selector input[value="Step '+(i+1)+'"]');if(v&&el&&cb){el.style.display='block';cb.checked=true;}});STATE.pendingImportTheme=row.theme||null;STATE.pendingImportStrand=row.strand||null;if(row.strand){var sel=document.getElementById('b-strand');if(sel)sel.value=row.strand;}window.scrollTo({top:0,behavior:'smooth'});notify('Row '+(idx+1)+' loaded. Set Grade/Term then save.');}
+function importAllRows(){var rows=STATE.importedRows||[];if(!rows.length)return;var lessons=getLessons();var count=0;rows.forEach(function(row){var sd={};var steps=[];['Step 1','Step 2','Step 3','Step 4'].forEach(function(step,i){var k='step'+(i+1);if(row[k]){sd[step]=row[k];steps.push(step);}});lessons.push({id:genId(),grade:'',term:'',week:'',date:'',lno:'',day:'',time:'',roll:'',theme:row.theme||'',strand:row.strand||'',substrand:row.substrand||'',slo:row.slo||'',sle:row.sle||'',kiq:row.kiq||'',resources:row.resources||'',orglearn:row.orglearn||'',intro:row.intro||'',steps:steps,stepDescs:sd,conclusion:row.conclusion||'',extended:row.extended||'',reflect:row.reflect||'',skill:row.skill||'',workdone:row.workdone||'',asm:row.asm||'',attainment:{EE:0,ME:0,AE:0,BE:0},matFiles:[],evFiles:[],createdAt:Date.now(),updatedAt:Date.now()});count++;});saveLessonsData(lessons);notify(count+' lesson(s) imported!');renderLessonsDB();document.getElementById('importPreview').innerHTML='';STATE.importedRows=[];}
+
+// STEPPER
+function initStepper(){var sections=[{id:'bf-identification',label:'🗂 ID'},{id:'bf-content',label:'📖 Content'},{id:'bf-outcomes',label:'🎯 Outcomes'},{id:'bf-resources-card',label:'📦 Resources'},{id:'bf-orglearn',label:'🏫 Org'},{id:'bf-development',label:'🪜 Steps'},{id:'bf-closing',label:'🔚 Closing'},{id:'bf-reflection',label:'🪞 Reflection'},{id:'bf-attainment',label:'📊 Attainment'},{id:'bf-materials',label:'📎 Files'}];var st=document.getElementById('bfStepper');if(!st)return;st.innerHTML=sections.map(function(s){return '<span class="stepper-chip" data-target="'+s.id+'" onclick="scrollToSection(\''+s.id+'\')">'+s.label+'</span>';}).join('');if(STATE.stepperObs)STATE.stepperObs.disconnect();STATE.stepperObs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting)document.querySelectorAll('.stepper-chip').forEach(function(c){c.classList.toggle('active',c.dataset.target===e.target.id);});});},{threshold:0.3});sections.forEach(function(s){var el=document.getElementById(s.id);if(el)STATE.stepperObs.observe(el);});}
+function scrollToSection(id){var el=document.getElementById(id);if(!el)return;window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-155,behavior:'smooth'});}
+
+// BASE FORM
+function initBaseTab(){populateBaseStrands();if(STATE.editingLessonId){loadLessonIntoForm(STATE.editingLessonId);}else{var d={slo:'By the end of the lesson, the learner should be able to:\na) ',sle:'The learner is guided to:\n• ',kiq:'1. ',resources:'~ ',skill:'i. ',workdone:'i) '};Object.entries(d).forEach(function(pair){var el=document.getElementById('b-'+pair[0]);if(el&&!el.value)el.value=pair[1];});}renderLessonsDB();setTimeout(initStepper,100);document.querySelectorAll('#tab-base input:not([readonly]),#tab-base select,#tab-base textarea').forEach(function(el){el.addEventListener('input',setDirty,{once:true});el.addEventListener('change',setDirty,{once:true});});}
+
+function populateBaseStrands(){
+  var gradeEl=document.getElementById('b-grade');var grade=gradeEl?parseInt(gradeEl.value)||0:0;
+  var s=getSetup();var strandArr=[];
+  if(grade){strandArr=s.strands[grade]||[];}
+  else{[7,8,9].forEach(function(g){(s.strands[g]||[]).forEach(function(v){if(strandArr.indexOf(v)<0)strandArr.push(v);});});}
+  var sel=document.getElementById('b-strand');var cur=sel.value;
+  sel.innerHTML='<option value="">'+(grade?'-- Select --':'-- Select Grade First --')+'</option>'+strandArr.map(function(st){return '<option value="'+escHtml(st)+'"'+(cur===st?' selected':'')+'>'+escHtml(st)+'</option>';}).join('');
+  if(STATE.pendingImportStrand)sel.value=STATE.pendingImportStrand;
+}
+function populateThemesForGrade(grade){var s=getSetup();var themes=s.themes[parseInt(grade)]||[];var sel=document.getElementById('b-theme');var cur=sel.value;sel.innerHTML='<option value="">-- Select --</option>'+themes.map(function(t){return '<option value="'+escHtml(t)+'"'+(cur===t?' selected':'')+'>'+escHtml(t)+'</option>';}).join('');if(STATE.pendingImportTheme){if(themes.includes(STATE.pendingImportTheme)){sel.value=STATE.pendingImportTheme;}else{var o=document.createElement('option');o.value=STATE.pendingImportTheme;o.textContent=STATE.pendingImportTheme+' (imported)';o.selected=true;sel.appendChild(o);}}}
+function onBaseGradeChange(){var grade=document.getElementById('b-grade').value;if(grade){populateThemesForGrade(grade);populateBaseStrands();document.getElementById('b-roll').value=getSetup().rolls[parseInt(grade)]||'';updateTimeFromSchedule();autoGenerateLNo();}else{document.getElementById('b-theme').innerHTML='<option value="">-- Select Grade First --</option>';document.getElementById('b-strand').innerHTML='<option value="">-- Select Grade First --</option>';document.getElementById('b-roll').value='';}}
+function onDateChange(){var v=document.getElementById('b-date').value;if(!v)return;var d=new Date(v+'T00:00:00');document.getElementById('b-day').value=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][d.getDay()];updateTimeFromSchedule();}
+function updateTimeFromSchedule(){var grade=document.getElementById('b-grade').value;var day=document.getElementById('b-day').value;if(!grade||!day){document.getElementById('b-time').value='';return;}var entry=(getSetup().schedule||[]).find(function(r){return r.day===day&&r.grade==grade;});document.getElementById('b-time').value=(entry&&entry.timeFrom&&entry.timeTo)?(entry.timeFrom+' – '+entry.timeTo):'';}
+function autoGenerateLNo(){var grade=document.getElementById('b-grade').value;var term=document.getElementById('b-term').value;var week=document.getElementById('b-week').value;var el=document.getElementById('b-lno');if(!grade||!term||!week||!el||el.value)return;el.value='L'+String(getLessons().filter(function(l){return l.grade===grade&&l.term===term&&l.week===week;}).length+1).padStart(3,'0');}
+function toggleStep(id,cb){document.getElementById(id).style.display=cb.checked?'block':'none';}
+function handleFileUpload(type,input){var files=Array.from(input.files);if(type==='mat'){STATE.matFiles=STATE.matFiles.concat(files.map(function(f){return{name:f.name,size:f.size};}));renderFileList('matFileList',STATE.matFiles,'mat');}else{STATE.evFiles=STATE.evFiles.concat(files.map(function(f){return{name:f.name,size:f.size};}));renderFileList('evFileList',STATE.evFiles,'ev');}}
+function renderFileList(elId,files,type){document.getElementById(elId).innerHTML=(files||[]).map(function(f,i){return '<div class="file-item"><span>📄 '+escHtml(f.name)+' <span class="muted">('+((f.size||0)/1024).toFixed(1)+'KB)</span></span><button class="remove-btn" onclick="removeFile(\''+type+'\','+i+')" style="width:22px;height:22px;font-size:11px">✕</button></div>';}).join('');}
+function removeFile(type,i){if(type==='mat'){STATE.matFiles.splice(i,1);renderFileList('matFileList',STATE.matFiles,'mat');}else{STATE.evFiles.splice(i,1);renderFileList('evFileList',STATE.evFiles,'ev');}}
+function getSelectedSteps(){var steps=[];var descs={};document.querySelectorAll('.step-selector input:checked').forEach(function(cb){var step=cb.value;steps.push(step);var id='b-'+step.toLowerCase().replace(' ','');descs[step]=document.getElementById(id)?document.getElementById(id).value:'';});return{steps:steps,descs:descs};}
+function getAtt(){function g(id){return parseInt((document.getElementById(id)&&document.getElementById(id).value)||0)||0;}return{EE:g('b-att-ee'),ME:g('b-att-me'),AE:g('b-att-ae'),BE:g('b-att-be')};}
+function setAtt(att){function sv(id,v){var el=document.getElementById(id);if(el)el.value=v||0;}sv('b-att-ee',(att||{}).EE||0);sv('b-att-me',(att||{}).ME||0);sv('b-att-ae',(att||{}).AE||0);sv('b-att-be',(att||{}).BE||0);updateAttTotal();}
+function updateAttTotal(){function g(id){return parseInt((document.getElementById(id)&&document.getElementById(id).value)||0)||0;}var t=g('b-att-ee')+g('b-att-me')+g('b-att-ae')+g('b-att-be');var el=document.getElementById('attTotal');if(el)el.textContent=t?'Total: '+t+' learner(s) recorded':'';}
+
+function saveBaseForm(){
+  var grade=document.getElementById('b-grade').value;var term=document.getElementById('b-term').value;if(!grade){notify('Please select a Grade.','err');return;}if(!term){notify('Please select a Term.','err');return;}
+  var stepData=getSelectedSteps();function gv(id){var el=document.getElementById(id);return el?el.value:'';}
+  var lesson={id:STATE.editingLessonId||genId(),grade:grade,term:term,week:gv('b-week'),date:gv('b-date'),lno:gv('b-lno').trim(),day:gv('b-day'),time:gv('b-time'),roll:gv('b-roll'),theme:gv('b-theme'),strand:gv('b-strand'),substrand:gv('b-substrand').trim(),slo:gv('b-slo').trim(),sle:gv('b-sle').trim(),kiq:gv('b-kiq').trim(),resources:gv('b-resources').trim(),orglearn:gv('b-orglearn').trim(),intro:gv('b-intro').trim(),steps:stepData.steps,stepDescs:stepData.descs,extended:gv('b-extended').trim(),conclusion:gv('b-conclusion').trim(),reflect:gv('b-reflect').trim(),skill:gv('b-skill').trim(),workdone:gv('b-workdone').trim(),asm:gv('b-asm').trim(),attainment:getAtt(),matFiles:STATE.matFiles.map(function(f){return f.name;}),evFiles:STATE.evFiles.map(function(f){return f.name;}),
+    createdAt:STATE.editingLessonId?(getLessons().find(function(l){return l.id===STATE.editingLessonId;})||{}).createdAt||Date.now():Date.now(),updatedAt:Date.now()};
+  STATE.pendingImportTheme=null;STATE.pendingImportStrand=null;
+  var lessons=getLessons();var idx=lessons.findIndex(function(l){return l.id===lesson.id;});if(idx>=0)lessons[idx]=lesson;else lessons.push(lesson);
+  saveLessonsData(lessons);clearDirty();notify(STATE.editingLessonId?'Lesson updated!':'Lesson saved!');STATE.editingLessonId=null;newBaseForm();renderLessonsDB();
+}
+function newBaseForm(){
+  STATE.editingLessonId=null;STATE.matFiles=[];STATE.evFiles=[];STATE.pendingImportTheme=null;STATE.pendingImportStrand=null;clearDirty();
+  document.getElementById('baseFormTitle').textContent='📝 New Lesson Record';
+  ['b-grade','b-term','b-week','b-date','b-lno','b-day','b-time','b-roll','b-theme','b-strand','b-substrand','b-slo','b-sle','b-kiq','b-resources','b-orglearn','b-intro','b-extended','b-conclusion','b-reflect','b-skill','b-workdone','b-asm','b-step1','b-step2','b-step3','b-step4'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  ['step1','step2','step3','step4'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.display='none';});
+  document.querySelectorAll('.step-selector input').forEach(function(cb){cb.checked=false;});
+  renderFileList('matFileList',[]);renderFileList('evFileList',[]);
+  document.getElementById('b-theme').innerHTML='<option value="">-- Select Grade First --</option>';
+  document.getElementById('b-strand').innerHTML='<option value="">-- Select Grade First --</option>';
+  setAtt({EE:0,ME:0,AE:0,BE:0});
+  var d={slo:'By the end of the lesson, the learner should be able to:\na) ',sle:'The learner is guided to:\n• ',kiq:'1. ',resources:'~ ',skill:'i. ',workdone:'i) '};
+  Object.entries(d).forEach(function(pair){var el=document.getElementById('b-'+pair[0]);if(el)el.value=pair[1];});
+  renderLessonsDB();
+}
+function loadLessonIntoForm(id){
+  var lesson=getLessons().find(function(l){return l.id===id;});if(!lesson)return;
+  STATE.editingLessonId=id;document.getElementById('baseFormTitle').textContent='✏️ Editing Lesson';
+  function sv(eid,v){var el=document.getElementById(eid);if(el)el.value=v||'';}
+  sv('b-grade',lesson.grade);populateThemesForGrade(lesson.grade);populateBaseStrands();
+  sv('b-term',lesson.term);sv('b-week',lesson.week);sv('b-date',lesson.date);sv('b-lno',lesson.lno);sv('b-day',lesson.day);sv('b-time',lesson.time);sv('b-roll',lesson.roll);sv('b-theme',lesson.theme);sv('b-strand',lesson.strand);sv('b-substrand',lesson.substrand);sv('b-slo',lesson.slo);sv('b-sle',lesson.sle);sv('b-kiq',lesson.kiq);sv('b-resources',lesson.resources);sv('b-orglearn',lesson.orglearn);sv('b-intro',lesson.intro);sv('b-extended',lesson.extended);sv('b-conclusion',lesson.conclusion);sv('b-reflect',lesson.reflect);sv('b-skill',lesson.skill);sv('b-workdone',lesson.workdone);sv('b-asm',lesson.asm||'');
+  setAtt(lesson.attainment);
+  (lesson.steps||[]).forEach(function(step){var sid='step'+step.split(' ')[1];var cb=document.querySelector('.step-selector input[value="'+step+'"]');if(cb){cb.checked=true;document.getElementById(sid).style.display='block';}sv('b-'+sid,(lesson.stepDescs||{})[step]);});
+  STATE.matFiles=(lesson.matFiles||[]).map(function(n){return{name:n,size:0};});STATE.evFiles=(lesson.evFiles||[]).map(function(n){return{name:n,size:0};});
+  renderFileList('matFileList',STATE.matFiles,'mat');renderFileList('evFileList',STATE.evFiles,'ev');
+  renderLessonsDB();window.scrollTo({top:0,behavior:'smooth'});
+}
+function renderLessonsDB(){
+  var fg=document.getElementById('dbFilterGrade')?document.getElementById('dbFilterGrade').value:'';var ft=document.getElementById('dbFilterTerm')?document.getElementById('dbFilterTerm').value:'';
+  var search=document.getElementById('lessonSearch')?(document.getElementById('lessonSearch').value||'').toLowerCase():'';
+  var lessons=getLessons();if(fg)lessons=lessons.filter(function(l){return l.grade===fg;});if(ft)lessons=lessons.filter(function(l){return l.term===ft;});
+  if(search)lessons=lessons.filter(function(l){return[l.theme,l.strand,l.substrand,l.lno,l.slo].some(function(v){return(v||'').toLowerCase().indexOf(search)>=0;});});
+  lessons.sort(function(a,b){return b.updatedAt-a.updatedAt;});
+  document.getElementById('lessonCount').textContent=lessons.length+' record'+(lessons.length!==1?'s':'');
+  document.getElementById('lessonsDB').innerHTML=lessons.length?lessons.map(function(l){var att=l.attainment||{};var hasAtt=att.EE||att.ME||att.AE||att.BE;
+    return '<div class="lsn-card" data-grade="'+l.grade+'"><div class="lsn-info"><div class="lsn-title">Gr'+(l.grade||'?')+' · T'+(l.term||'?')+' W'+(l.week||'?')+' · '+escHtml(l.lno||'–')+' · '+escHtml(l.strand||'–')+'</div><div class="lsn-meta">📌 '+escHtml(l.theme||'–')+' · '+escHtml(l.substrand||'–')+' · '+(l.date||'–')+'</div>'+(hasAtt?'<div style="margin-top:3px;font-size:.72rem"><span class="cbl EE">EE:'+att.EE+'</span> <span class="cbl ME">ME:'+att.ME+'</span> <span class="cbl AE">AE:'+att.AE+'</span> <span class="cbl BE">BE:'+att.BE+'</span></div>':'')+'</div><div class="lsn-actions"><button class="btn btn-outline btn-xs" onclick="editLesson(\''+l.id+'\')">✏️</button><button class="btn btn-ghost btn-xs" onclick="cloneLesson(\''+l.id+'\')" title="Clone">📋</button><button class="btn btn-danger btn-xs" onclick="deleteLesson(\''+l.id+'\')">🗑</button></div></div>';}).join(''):'<div class="empty"><div class="empty-icon">📂</div>No matching records.'+((!fg&&!ft&&!search)?'<br><button class="btn btn-primary btn-sm mt2" onclick="newBaseForm();window.scrollTo(0,0)">➕ New Lesson</button>':'')+'</div>';
+}
+function editLesson(id){switchTab('base');loadLessonIntoForm(id);}
+function deleteLesson(id){if(!confirm('Delete this lesson? Restorable 7 days from Home.'))return;var lesson=getLessons().find(function(l){return l.id===id;});if(lesson){var bin=getDeletedBin();bin.unshift({lesson:lesson,deletedAt:Date.now()});saveDeletedBin(bin.slice(0,20));}saveLessonsData(getLessons().filter(function(l){return l.id!==id;}));if(STATE.editingLessonId===id)newBaseForm();renderLessonsDB();notify('Deleted. Restore from Home if needed.');}
+function cloneLesson(id){var orig=getLessons().find(function(l){return l.id===id;});if(!orig)return;var clone=JSON.parse(JSON.stringify(orig));clone.id=genId();clone.lno=clone.lno?'Copy-'+clone.lno:'copy';clone.createdAt=Date.now();clone.updatedAt=Date.now();var lessons=getLessons();lessons.push(clone);saveLessonsData(lessons);switchTab('base');setTimeout(function(){loadLessonIntoForm(clone.id);},100);notify('Cloned. Edit and save.');}
+function cleanDeletedBin(){var bin=getDeletedBin().filter(function(e){return Date.now()-e.deletedAt<7*24*3600*1000;});saveDeletedBin(bin);}
+function restoreLesson(id){var bin=getDeletedBin();var entry=bin.find(function(e){return e.lesson.id===id;});if(!entry)return;var lessons=getLessons();lessons.push(Object.assign({},entry.lesson,{updatedAt:Date.now()}));saveLessonsData(lessons);saveDeletedBin(bin.filter(function(e){return e.lesson.id!==id;}));notify('Lesson restored!');initHomeTab();}
+
+// INTERACTIVE RESPOND SECTION
+// Appended to every shared HTML file so recipients can sign, comment and re-share/print
+function buildRespondSection(){
+  // All styling is inline so it works regardless of what CSS the shared file has.
+  // The script uses window.onload + setTimeout to ensure canvas is rendered before sizing.
+  var html = '';
+  html += '<div id="respondSection" style="margin-top:32px;border:2.5px solid #1b4332;border-radius:10px;padding:20px;background:#f0faf4;page-break-inside:avoid;font-family:sans-serif">';
+  html += '<h3 style="font-size:1.05rem;font-weight:700;color:#1b4332;margin:0 0 6px 0;padding-bottom:8px;border-bottom:1.5px solid #9dd4b4">✍️ Recipient Response</h3>';
+  html += '<p style="font-size:.82rem;color:#555;margin:0 0 14px 0">Fill in your details below, draw your signature, then tap the button to <b>Print</b> or <b>Share</b> your signed copy.</p>';
+  // Fields
+  html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px;margin-bottom:12px">';
+  html += '<div><label style="display:block;font-size:.7rem;font-weight:700;color:#555;text-transform:uppercase;margin-bottom:3px">Role</label>';
+  html += '<select id="r-role" style="width:100%;padding:7px 8px;border:1.5px solid #9dd4b4;border-radius:5px;font-size:13px;background:#fff"><option value="">-- Select --</option><option>Head Teacher</option><option>Deputy Head Teacher</option><option>Parent / Guardian</option><option>Class Teacher</option><option>Other</option></select></div>';
+  html += '<div><label style="display:block;font-size:.7rem;font-weight:700;color:#555;text-transform:uppercase;margin-bottom:3px">Full Name</label>';
+  html += '<input id="r-name" type="text" placeholder="Your full name" style="width:100%;padding:7px 8px;border:1.5px solid #9dd4b4;border-radius:5px;font-size:13px;background:#fff;box-sizing:border-box"></div>';
+  html += '<div><label style="display:block;font-size:.7rem;font-weight:700;color:#555;text-transform:uppercase;margin-bottom:3px">Date</label>';
+  html += '<input id="r-date" type="date" style="width:100%;padding:7px 8px;border:1.5px solid #9dd4b4;border-radius:5px;font-size:13px;background:#fff;box-sizing:border-box"></div>';
+  html += '</div>';
+  html += '<div style="margin-bottom:12px"><label style="display:block;font-size:.7rem;font-weight:700;color:#555;text-transform:uppercase;margin-bottom:3px">Comments / Remarks</label>';
+  html += '<textarea id="r-comments" rows="3" placeholder="Add your comments or remarks here..." style="width:100%;padding:7px 8px;border:1.5px solid #9dd4b4;border-radius:5px;font-size:13px;background:#fff;resize:vertical;box-sizing:border-box"></textarea></div>';
+  // Signature area
+  html += '<div style="margin-bottom:14px"><label style="display:block;font-size:.7rem;font-weight:700;color:#555;text-transform:uppercase;margin-bottom:5px">Your Signature <span style="font-weight:400;font-style:italic">(draw with finger or mouse)</span></label>';
+  html += '<canvas id="rSig" style="border:2px dashed #9dd4b4;border-radius:6px;display:block;background:#fff;touch-action:none;width:100%;max-width:380px;height:120px;cursor:crosshair"></canvas>';
+  html += '<button id="rSigClear" style="margin-top:6px;padding:5px 12px;background:#fff;border:1px solid #ccc;border-radius:5px;cursor:pointer;font-size:12px;color:#555">🗑 Clear Signature</button></div>';
+  // Action buttons
+  html += '<div id="r-actions" style="display:flex;gap:10px;flex-wrap:wrap">';
+  html += '<button id="rPrintBtn" style="padding:10px 18px;background:#1b4332;color:#fff;border:none;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600">🖨 Print with my signature</button>';
+  html += '<button id="rShareBtn" style="padding:10px 18px;background:#fff;color:#1b4332;border:2px solid #1b4332;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600">📤 Share with my signature</button>';
+  html += '</div>';
+  html += '</div>';
+  // Self-contained script — uses event listeners not onclick attributes, runs after load
+  html += '<script>';
+  html += '(function(){';
+  html += 'function initRS(){';
+  html += '  var c=document.getElementById("rSig");';
+  html += '  if(!c)return;';
+  // Size canvas properly after render
+  html += '  var w=c.parentElement?c.parentElement.offsetWidth:380;';
+  html += '  c.width=Math.min(380,w||380);';
+  html += '  c.height=120;';
+  html += '  var ctx=c.getContext("2d");';
+  html += '  ctx.strokeStyle="#1b4332";ctx.lineWidth=2.5;ctx.lineCap="round";ctx.lineJoin="round";';
+  html += '  var drw=false,lx=0,ly=0;';
+  html += '  function gp(e){var r=c.getBoundingClientRect();var s=e.touches?e.touches[0]:e;return{x:(s.clientX-r.left)*(c.width/r.width),y:(s.clientY-r.top)*(c.height/r.height)};}';
+  html += '  c.addEventListener("mousedown",function(e){drw=true;var p=gp(e);lx=p.x;ly=p.y;ctx.beginPath();ctx.moveTo(p.x,p.y);});';
+  html += '  c.addEventListener("mousemove",function(e){if(!drw)return;var p=gp(e);ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(p.x,p.y);ctx.stroke();lx=p.x;ly=p.y;});';
+  html += '  c.addEventListener("mouseup",function(){drw=false;});';
+  html += '  c.addEventListener("mouseleave",function(){drw=false;});';
+  html += '  c.addEventListener("touchstart",function(e){e.preventDefault();drw=true;var p=gp(e);lx=p.x;ly=p.y;ctx.beginPath();ctx.moveTo(p.x,p.y);},{passive:false});';
+  html += '  c.addEventListener("touchmove",function(e){e.preventDefault();if(!drw)return;var p=gp(e);ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(p.x,p.y);ctx.stroke();lx=p.x;ly=p.y;},{passive:false});';
+  html += '  c.addEventListener("touchend",function(){drw=false;});';
+  // Clear button
+  html += '  var clrBtn=document.getElementById("rSigClear");';
+  html += '  if(clrBtn)clrBtn.addEventListener("click",function(){ctx.clearRect(0,0,c.width,c.height);});';
+  // Check if canvas is blank
+  html += '  function getSig(){';
+  html += '    var b=document.createElement("canvas");b.width=c.width;b.height=c.height;';
+  html += '    return c.toDataURL()===b.getContext("2d").canvas.toDataURL()?null:c.toDataURL();';
+  html += '  }';
+  // Build the signed response block HTML
+  html += '  function buildRBlock(){';
+  html += '    var role=(document.getElementById("r-role")||{}).value||"";';
+  html += '    var name=(document.getElementById("r-name")||{}).value||"";';
+  html += '    var date=(document.getElementById("r-date")||{}).value||"";';
+  html += '    var cmt=(document.getElementById("r-comments")||{}).value||"";';
+  html += '    var sig=getSig();';
+  html += '    var sigH=sig';
+  html += '      ?"<img src=\\""+sig+"\\" style=\\"height:52px;max-width:220px;display:block;margin-bottom:4px\\">"';
+  html += '      :"<div style=\\"height:52px;border-bottom:1.5px solid #333;width:200px\\"></div>";';
+  html += '    return "<div style=\\"border:2px solid #1b4332;border-radius:6px;padding:14px;margin-top:20px;page-break-inside:avoid\\"><div style=\\"font-weight:700;color:#1b4332;font-size:.95rem;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #c0d8c8\\">✍️ Recipient Response</div>"';
+  html += '      +(role?"<div style=\\"font-size:.82rem;margin-bottom:3px\\"><b>Role:</b> "+role+"</div>":"")';
+  html += '      +(name?"<div style=\\"font-size:.82rem;margin-bottom:3px\\"><b>Name:</b> "+name+"</div>":"")';
+  html += '      +(date?"<div style=\\"font-size:.82rem;margin-bottom:8px\\"><b>Date:</b> "+date+"</div>":"")';
+  html += '      +(cmt?"<div style=\\"font-size:.82rem;white-space:pre-wrap;padding:7px;background:#f0faf4;border-radius:4px;margin-bottom:10px\\">"+cmt+"</div>":"")';
+  html += '      +"<div>"+sigH+"<div style=\\"border-top:1px solid #333;margin-top:4px;padding-top:2px;font-size:.75rem;color:#555;width:200px;text-align:center\\">"+(name||"Recipient")+" – Signature &amp; Date</div></div></div>";';
+  html += '  }';
+  // Get document content without the respond section
+  html += '  function getDocBody(){';
+  html += '    var rs=document.getElementById("respondSection");';
+  html += '    var clone=document.body.cloneNode(true);';
+  html += '    var rsInClone=clone.querySelector("#respondSection");';
+  html += '    if(rsInClone)rsInClone.remove();';
+  html += '    return clone.innerHTML;';
+  html += '  }';
+  // Print
+  html += '  var printBtn=document.getElementById("rPrintBtn");';
+  html += '  if(printBtn)printBtn.addEventListener("click",function(){';
+  html += '    var rb=buildRBlock();var docH=getDocBody();';
+  html += '    var printCSS="*{box-sizing:border-box}body{font-family:sans-serif;font-size:12px;color:#111;padding:20px;max-width:210mm;margin:0 auto;line-height:1.5}#r-actions{display:none!important}table{width:100%;border-collapse:collapse}th{background:#1b4332;color:#fff;padding:4px 6px;font-size:.69rem;-webkit-print-color-adjust:exact;print-color-adjust:exact}td{border:1px solid #bbb;padding:4px 6px;vertical-align:top}";';
+  html += '    var w=window.open("","_blank");';
+  html += '    if(!w){alert("Popup blocked – please allow popups to print.");return;}';
+  html += '    w.document.write("<!DOCTYPE html><html><head><meta charset=UTF-8><style>"+printCSS+"</style></head><body>"+docH+rb+"</body></html>");';
+  html += '    w.document.close();';
+  html += '    w.onload=function(){setTimeout(function(){w.print();},600);};';
+  html += '  });';
+  // Share
+  html += '  var shareBtn=document.getElementById("rShareBtn");';
+  html += '  if(shareBtn)shareBtn.addEventListener("click",async function(){';
+  html += '    var rb=buildRBlock();var docH=getDocBody();';
+  html += '    var shareCSS="*{box-sizing:border-box}body{font-family:sans-serif;font-size:12px;color:#111;padding:20px;max-width:210mm;margin:0 auto;line-height:1.5}@media print{#r-actions{display:none!important}}table{width:100%;border-collapse:collapse}th{background:#1b4332;color:#fff;padding:4px 6px;font-size:.69rem;-webkit-print-color-adjust:exact;print-color-adjust:exact}td{border:1px solid #bbb;padding:4px 6px;vertical-align:top}";';
+  html += '    var full="<!DOCTYPE html><html><head><meta charset=UTF-8><style>"+shareCSS+"</style></head><body>"+docH+rb+"</body></html>";';
+  html += '    var blob=new Blob([full],{type:"text/html;charset=utf-8"});';
+  html += '    var file=new File([blob],"signed_document.html",{type:"text/html"});';
+  html += '    if(navigator.share){';
+  html += '      try{';
+  html += '        if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:"Signed Document",text:"Please find the signed document attached."});return;}';
+  html += '        var u=URL.createObjectURL(blob);await navigator.share({title:"Signed Document",text:"Signed document",url:u});';
+  html += '        setTimeout(function(){URL.revokeObjectURL(u);},30000);return;';
+  html += '      }catch(e){if(e.name==="AbortError")return;}';
+  html += '    }';
+  html += '    var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="signed_document.html";a.click();';
+  html += '    alert("File downloaded. Open it to view, then use your browser Share or Print option.");';
+  html += '  });';
+  html += '}'; // end initRS
+  // Run after page loads — use both window.onload and a timeout fallback
+  html += 'if(document.readyState==="complete"){setTimeout(initRS,200);}';
+  html += 'else{window.addEventListener("load",function(){setTimeout(initRS,200);});}';
+  html += '})();';
+  html += '<\/script>';
+  return html;
+}
+
+// LP BUILD
+function buildLPHtml(l){
+  if(!l)return '<p>Not found.</p>';
+  var s=getSetup();
+  var sigHtml=s.signature?'<img src="'+s.signature+'" style="height:50px;max-width:180px;display:block">':'<div style="height:50px;border-bottom:1px solid #333;width:180px"></div>';
+  var stepsHtml=(l.steps||[]).map(function(st){return '<div class="lp-step-block"><div class="lp-step-label">'+st+'</div><div style="white-space:pre-wrap;font-size:.82rem;line-height:1.55">'+escHtml((l.stepDescs||{})[st]||'')+'</div></div>';}).join('');
+  var att=l.attainment||{};var hasAtt=att.EE||att.ME||att.AE||att.BE;
+  return '<div class="print-lp-header"><h2>'+escHtml(s.school||'Junior Secondary School')+'</h2><h3>LESSON PLAN – '+escHtml(s.subject||'English')+'</h3><p>By: '+escHtml(s.teacher||'')+' | TSC: '+escHtml(s.tsc||'')+' | '+(s.academicYear||'')+'</p></div>'
+    +'<div class="lp-meta-grid"><div class="lp-meta-item"><label>Grade</label><span>'+(l.grade||'–')+'</span></div><div class="lp-meta-item"><label>Term</label><span>'+(l.term||'–')+'</span></div><div class="lp-meta-item"><label>Week</label><span>'+(l.week||'–')+'</span></div><div class="lp-meta-item"><label>L No.</label><span>'+(l.lno||'–')+'</span></div><div class="lp-meta-item"><label>Date</label><span>'+(l.date||'–')+'</span></div><div class="lp-meta-item"><label>Day</label><span>'+(l.day||'–')+'</span></div><div class="lp-meta-item"><label>Time</label><span>'+(l.time||'–')+'</span></div><div class="lp-meta-item"><label>Roll</label><span>'+(l.roll||'–')+'</span></div></div>'
+    +'<div class="lp-section"><div class="lp-section-title">THEME / STRAND / SUB-STRAND</div><div class="lp-section-body"><b>Theme:</b> '+escHtml(l.theme||'–')+'<br><b>Strand:</b> '+escHtml(l.strand||'–')+'<br><b>Sub-strand:</b> '+escHtml(l.substrand||'–')+'</div></div>'
+    +'<div class="lp-section"><div class="lp-section-title">SPECIFIC LEARNING OUTCOMES</div><div class="lp-section-body">'+escHtml(l.slo||'–')+'</div></div>'
+    +'<div class="lp-section"><div class="lp-section-title">SUGGESTED LEARNING EXPERIENCES</div><div class="lp-section-body">'+escHtml(l.sle||'–')+'</div></div>'
+    +'<div class="lp-section"><div class="lp-section-title">KEY INQUIRY QUESTION(S)</div><div class="lp-section-body">'+escHtml(l.kiq||'–')+'</div></div>'
+    +'<div class="lp-section"><div class="lp-section-title">LEARNING RESOURCES</div><div class="lp-section-body">'+escHtml(l.resources||'–')+'</div></div>'
+    +'<div class="lp-section"><div class="lp-section-title">ORGANISATION OF LEARNING</div><div style="padding:6px 10px;font-size:.82rem"><b>Class Organisation:</b> '+escHtml(l.orglearn||'–')+'</div>'
+    +'<div class="lp-section-title" style="background:#2d6a4f;font-size:.75rem">Introduction</div><div class="lp-section-body">'+escHtml(l.intro||'–')+'</div>'
+    +(l.steps&&l.steps.length?'<div class="lp-section-title" style="background:#2d6a4f;font-size:.75rem">Lesson Development</div>'+stepsHtml:'')
+    +'<div class="lp-section-title" style="background:#2d6a4f;font-size:.75rem">Extended Activities</div><div class="lp-section-body">'+escHtml(l.extended||'–')+'</div>'
+    +'<div class="lp-section-title" style="background:#2d6a4f;font-size:.75rem">Conclusion</div><div class="lp-section-body">'+escHtml(l.conclusion||'–')+'</div></div>'
+    +'<div class="lp-section"><div class="lp-section-title">ASSESSMENT METHODS</div><div class="lp-section-body">'+escHtml(l.asm||'–')+'</div></div>'
+    +'<div class="lp-section"><div class="lp-section-title">LESSON SKILL ASSESSED</div><div class="lp-section-body">'+escHtml(l.skill||'–')+'</div></div>'
+    +'<div class="lp-section"><div class="lp-section-title">WORK DONE</div><div class="lp-section-body">'+escHtml(l.workdone||'–')+'</div></div>'
+    +'<div class="lp-section"><div class="lp-section-title">REFLECTION</div><div class="lp-section-body" style="min-height:50px">'+escHtml(l.reflect||'')+'</div></div>'
+    +(hasAtt?'<div class="lp-section"><div class="lp-section-title">CBC ATTAINMENT SUMMARY</div><div class="att-print-row"><div class="att-print-box"><div class="lbl">EE</div>'+(att.EE||0)+'</div><div class="att-print-box"><div class="lbl">ME</div>'+(att.ME||0)+'</div><div class="att-print-box"><div class="lbl">AE</div>'+(att.AE||0)+'</div><div class="att-print-box"><div class="lbl">BE</div>'+(att.BE||0)+'</div></div></div>':'')
+    +'<div class="sig-row"><div class="sig-block">'+sigHtml+'<div class="sig-line">'+escHtml(s.teacher||'Teacher')+' – Signature &amp; Date</div></div><div class="sig-block"><div style="height:50px;border-bottom:1px solid #333;width:180px"></div><div class="sig-line">Head Teacher – Signature &amp; Date</div></div></div>';
+}
+
+// LP TAB
+function renderLP(){
+  var grade=document.getElementById('lp-grade')?document.getElementById('lp-grade').value:'';var term=document.getElementById('lp-term')?document.getElementById('lp-term').value:'';var week=document.getElementById('lp-week')?document.getElementById('lp-week').value:'';
+  var lessons=getLessons();if(grade)lessons=lessons.filter(function(l){return l.grade===grade;});if(term)lessons=lessons.filter(function(l){return l.term===term;});if(week)lessons=lessons.filter(function(l){return l.week===week;});
+  lessons.sort(function(a,b){if(a.grade!==b.grade)return parseInt(a.grade)-parseInt(b.grade);if(a.term!==b.term)return parseInt(a.term)-parseInt(b.term);if(a.week!==b.week)return parseInt(a.week)-parseInt(b.week);return(a.lno||'').localeCompare(b.lno||'');});
+  document.getElementById('lpList').innerHTML=lessons.length?lessons.map(function(l){var att=l.attainment||{};var hasAtt=att.EE||att.ME||att.AE||att.BE;var sch=l.steps&&l.steps.length?l.steps.map(function(st){return '<div class="mb1"><b>'+st+':</b> '+escHtml((l.stepDescs||{})[st]||'')+'</div>';}).join(''):'';
+    return '<div class="card"><div class="flex-between mb2"><div><b style="color:var(--primary);font-size:.9rem">Gr'+(l.grade||'?')+' | T'+(l.term||'?')+' W'+(l.week||'?')+' | '+escHtml(l.lno||'–')+'</b><div class="muted">'+escHtml(l.strand||'')+(l.substrand?' – '+escHtml(l.substrand):'')+'</div></div><div class="btn-group"><button class="btn btn-primary btn-sm no-print" onclick="showPrintPreview(buildLPHtml(getLessons().find(function(x){return x.id===\''+l.id+'\';})))">🖨</button><button class="btn btn-accent btn-sm no-print" onclick="exportSingleLPXls(\''+l.id+'\')">📊</button><button class="btn btn-outline btn-sm no-print" onclick="shareSingleLP(\''+l.id+'\')">📤</button><button class="btn btn-ghost btn-sm no-print" onclick="cloneLesson(\''+l.id+'\')">📋</button><button class="btn btn-ghost btn-sm no-print" onclick="switchTab(\'base\');editLesson(\''+l.id+'\')">✏️</button></div></div><div class="form-grid" style="font-size:13px"><div><b>Date:</b> '+(l.date||'–')+'</div><div><b>Day:</b> '+(l.day||'–')+'</div><div><b>Time:</b> '+(l.time||'–')+'</div><div><b>Roll:</b> '+(l.roll||'–')+'</div><div class="full"><b>Theme:</b> '+escHtml(l.theme||'–')+'</div></div><div class="divider"></div><div class="mb1"><b>SLO:</b><br><span style="white-space:pre-wrap;font-size:12.5px">'+escHtml(l.slo||'–')+'</span></div><div class="mb1"><b>KIQ:</b><br><span style="white-space:pre-wrap;font-size:12.5px">'+escHtml(l.kiq||'–')+'</span></div><div class="mb1"><b>Resources:</b> '+escHtml(l.resources||'–')+'</div><div class="mb1"><b>Org:</b> '+escHtml(l.orglearn||'–')+'</div><div class="mb1"><b>Intro:</b><br><span style="white-space:pre-wrap;font-size:12.5px">'+escHtml(l.intro||'–')+'</span></div><div class="mb1"><b>Development:</b><br>'+(sch||'–')+'</div><div class="mb1"><b>Conclusion:</b> '+escHtml(l.conclusion||'–')+'</div><div class="mb1"><b>Assessment Methods:</b> '+escHtml(l.asm||'–')+'</div><div class="mb1"><b>Reflection:</b> '+escHtml(l.reflect||'–')+'</div>'+(hasAtt?'<div class="flex mt1" style="gap:5px;flex-wrap:wrap"><span class="cbl EE">EE:'+att.EE+'</span><span class="cbl ME">ME:'+att.ME+'</span><span class="cbl AE">AE:'+att.AE+'</span><span class="cbl BE">BE:'+att.BE+'</span></div>':'')+'</div>';}).join(''):'<div class="empty"><div class="empty-icon">📋</div>No lessons match the filters.</div>';
+}
+function exportSingleLPXls(id){var l=getLessons().find(function(x){return x.id===id;});if(!l)return;var h=['Grade','Term','Week','L No.','Date','Day','Time','Roll','Theme','Strand','Sub-strand','SLO','SLE','KIQ','Resources','Organisation','Introduction','Step 1','Step 2','Step 3','Step 4','Extended','Conclusion','Assessment Methods','Lesson Skill','Work Done','Reflection','EE','ME','AE','BE'];var r=[[l.grade,l.term,l.week,l.lno,l.date,l.day,l.time,l.roll,l.theme,l.strand,l.substrand,l.slo,l.sle,l.kiq,l.resources,l.orglearn,l.intro,(l.stepDescs||{})['Step 1']||'',(l.stepDescs||{})['Step 2']||'',(l.stepDescs||{})['Step 3']||'',(l.stepDescs||{})['Step 4']||'',l.extended,l.conclusion,l.asm||'',l.skill,l.workdone,l.reflect,(l.attainment||{}).EE||0,(l.attainment||{}).ME||0,(l.attainment||{}).AE||0,(l.attainment||{}).BE||0]];xlsxExport(h,r,'LP','LP_Gr'+l.grade+'_T'+l.term+'_W'+l.week+'_'+(l.lno||'')+'.xlsx');}
+async function shareSingleLP(id){var l=getLessons().find(function(x){return x.id===id;});if(!l)return;var html=buildLPHtml(l)+buildRespondSection();await shareAsFile(html,'LP_Gr'+l.grade+'_T'+l.term+'_W'+l.week,'LP Gr'+l.grade+' T'+l.term+' W'+l.week);}
+function exportAllLPXls(){var grade=document.getElementById('lp-grade')?document.getElementById('lp-grade').value:'';var term=document.getElementById('lp-term')?document.getElementById('lp-term').value:'';var week=document.getElementById('lp-week')?document.getElementById('lp-week').value:'';var lessons=getLessons();if(grade)lessons=lessons.filter(function(l){return l.grade===grade;});if(term)lessons=lessons.filter(function(l){return l.term===term;});if(week)lessons=lessons.filter(function(l){return l.week===week;});if(!lessons.length){notify('No lessons to export.','');return;}var h=['Grade','Term','Week','L No.','Date','Day','Time','Roll','Theme','Strand','Sub-strand','SLO','SLE','KIQ','Resources','Organisation','Introduction','Step 1','Step 2','Step 3','Step 4','Extended','Conclusion','Assessment Methods','Lesson Skill','Work Done','Reflection','EE','ME','AE','BE'];var r=lessons.map(function(l){return[l.grade,l.term,l.week,l.lno,l.date,l.day,l.time,l.roll,l.theme,l.strand,l.substrand,l.slo,l.sle,l.kiq,l.resources,l.orglearn,l.intro,(l.stepDescs||{})['Step 1']||'',(l.stepDescs||{})['Step 2']||'',(l.stepDescs||{})['Step 3']||'',(l.stepDescs||{})['Step 4']||'',l.extended,l.conclusion,l.asm||'',l.skill,l.workdone,l.reflect,(l.attainment||{}).EE||0,(l.attainment||{}).ME||0,(l.attainment||{}).AE||0,(l.attainment||{}).BE||0];});xlsxExport(h,r,'Lesson Plans','AllLP_'+(grade?'G'+grade+'_':'')+(term?'T'+term+'_':'')+new Date().toISOString().slice(0,10)+'.xlsx');}
+async function shareAllLP(){var grade=document.getElementById('lp-grade')?document.getElementById('lp-grade').value:'';var term=document.getElementById('lp-term')?document.getElementById('lp-term').value:'';var week=document.getElementById('lp-week')?document.getElementById('lp-week').value:'';var lessons=getLessons();if(grade)lessons=lessons.filter(function(l){return l.grade===grade;});if(term)lessons=lessons.filter(function(l){return l.term===term;});if(week)lessons=lessons.filter(function(l){return l.week===week;});if(!lessons.length){notify('No lessons to share.','');return;}var html=lessons.map(function(l){return buildLPHtml(l)+'<div style="page-break-after:always;margin:20px 0;border-top:2px dashed #ccc"></div>';}).join('')+buildRespondSection();await shareAsFile(html,'LessonPlans_'+(grade?'G'+grade+'_':'')+(term?'T'+term+'_':'')+new Date().toISOString().slice(0,10),'Lesson Plans');}
+
+// SOW TAB  ── Fix: Assessment column reads l.asm (Assessment Methods)
+function renderSOW(){
+  var grade=document.getElementById('sow-grade')?document.getElementById('sow-grade').value:'';var term=document.getElementById('sow-term')?document.getElementById('sow-term').value:'';
+  var lessons=getLessons();if(grade)lessons=lessons.filter(function(l){return l.grade===grade;});if(term)lessons=lessons.filter(function(l){return l.term===term;});
+  lessons.sort(function(a,b){return parseInt(a.week)-parseInt(b.week)||(a.lno||'').localeCompare(b.lno||'');});
+  var hdrs=['Week','Lesson No.','Theme','Strand','Sub-strand','Specific Learning Outcomes','Key Inquiry Questions','Learning Experiences','Learning Resources','Assessment Methods','Reflection'];
+  var rows=lessons.map(function(l){return[l.week||'',l.lno||'',l.theme||'',l.strand||'',l.substrand||'',l.slo||'',l.kiq||'',l.sle||'',l.resources||'',l.asm||'',l.reflect||''];});
+  document.getElementById('sowDisplay').innerHTML='<div class="card">'+buildTable('SCHEME OF WORK – '+(getSetup().subject||'English')+(grade?' Grade '+grade:'')+(term?' Term '+term:''),hdrs,rows,true)+'</div>';
+}
+function getSOWData(){
+  var grade=document.getElementById('sow-grade')?document.getElementById('sow-grade').value:'';var term=document.getElementById('sow-term')?document.getElementById('sow-term').value:'';
+  var lessons=getLessons();if(grade)lessons=lessons.filter(function(l){return l.grade===grade;});if(term)lessons=lessons.filter(function(l){return l.term===term;});
+  lessons.sort(function(a,b){return parseInt(a.week)-parseInt(b.week)||(a.lno||'').localeCompare(b.lno||'');});
+  var s=getSetup();
+  var hdrs=['Week','L No.','Theme','Strand','Sub-strand','Specific Learning Outcomes','Key Inquiry Question(s)','Suggested Learning Experiences','L/Resources','Assessment Methods','Reflection'];
+  var rows=lessons.map(function(l){return[l.week||'',l.lno||'',l.theme||'',l.strand||'',l.substrand||'',l.slo||'',l.kiq||'',l.sle||'',l.resources||'',l.asm||'',l.reflect||''];});
+  var title='SCHEME OF WORK – '+(s.subject||'English')+(grade?' Grade '+grade+' ':'')+(term?' Term '+term:'');
+  var html='<div class="print-section-title">'+escHtml(s.school||'')+'\n'+escHtml(title)+'</div>'+buildTable('',hdrs,rows,true,true);
+  return{html:html,lessons:lessons,hdrs:hdrs,rows:rows,grade:grade,term:term};
+}
+function printSOW(){var d=getSOWData();showPrintPreview(d.html);}
+function exportSOWXls(){var d=getSOWData();if(!d.lessons.length){notify('No lessons.','');return;}xlsxExport(d.hdrs,d.rows,'SOW','SOW_'+(d.grade?'G'+d.grade+'_':'')+(d.term?'T'+d.term+'_':'')+new Date().toISOString().slice(0,10)+'.xlsx');}
+async function shareSOW(){var d=getSOWData();await shareAsFile(d.html+buildRespondSection(),'SOW_'+(d.grade?'G'+d.grade+'_':'')+(d.term?'T'+d.term+'_':'')+new Date().toISOString().slice(0,10),'SOW');}
+
+// ROW TAB  ── Fix: Lesson Skill BEFORE Work Done
+function renderROW(){
+  var grade=document.getElementById('row-grade')?document.getElementById('row-grade').value:'';var term=document.getElementById('row-term')?document.getElementById('row-term').value:'';var week=document.getElementById('row-week')?document.getElementById('row-week').value:'';
+  var lessons=getLessons();if(grade)lessons=lessons.filter(function(l){return l.grade===grade;});if(term)lessons=lessons.filter(function(l){return l.term===term;});if(week)lessons=lessons.filter(function(l){return l.week===week;});
+  lessons.sort(function(a,b){if(a.week!==b.week)return parseInt(a.week)-parseInt(b.week);return(a.lno||'').localeCompare(b.lno||'');});
+  var hdrs=['Date','Time','Lesson No.','Theme','Strand','Sub-strand','Lesson Skill','Work Done','Reflection','Signature'];
+  var rows=lessons.map(function(l){return[l.date||'',l.time||'',l.lno||'',l.theme||'',l.strand||'',l.substrand||'',l.skill||'',l.workdone||'',l.reflect||'',''];});
+  document.getElementById('rowDisplay').innerHTML='<div class="card">'+buildTable('RECORD OF WORK – '+(getSetup().subject||'English')+(grade?' Grade '+grade:'')+(term?' Term '+term:'')+(week?' Week '+week:''),hdrs,rows,false)+'</div>';
+}
+function getROWData(){
+  var grade=document.getElementById('row-grade')?document.getElementById('row-grade').value:'';var term=document.getElementById('row-term')?document.getElementById('row-term').value:'';var week=document.getElementById('row-week')?document.getElementById('row-week').value:'';
+  var lessons=getLessons();if(grade)lessons=lessons.filter(function(l){return l.grade===grade;});if(term)lessons=lessons.filter(function(l){return l.term===term;});if(week)lessons=lessons.filter(function(l){return l.week===week;});
+  lessons.sort(function(a,b){if(a.week!==b.week)return parseInt(a.week)-parseInt(b.week);return(a.lno||'').localeCompare(b.lno||'');});
+  var s=getSetup();var sigImg=s.signature?'<img src="'+s.signature+'" style="height:28px;max-width:100px;display:block">':'';
+  var hdrs=['Date','Time','L No.','Theme','Strand','Sub-strand','Lesson Skill','Work Done','Reflection','Signature'];
+  var rows=lessons.map(function(l){return[l.date||'',l.time||'',l.lno||'',l.theme||'',l.strand||'',l.substrand||'',l.skill||'',l.workdone||'',l.reflect||'',sigImg];});
+  var title='RECORD OF WORK – '+(s.subject||'English')+(grade?' Grade '+grade+' ':'')+(term?' Term '+term+' ':'')+(week?' Week '+week:'');
+  var html='<div class="print-section-title">'+escHtml(s.school||'')+'\n'+escHtml(title.trim())+'</div>'+buildTableRaw(hdrs,rows,false);
+  return{html:html,lessons:lessons,hdrs:hdrs,grade:grade,term:term,week:week,s:s};
+}
+function printROW(){var d=getROWData();showPrintPreview(d.html);}
+function exportROWXls(){var d=getROWData();if(!d.lessons.length){notify('No records.','');return;}var h=['Date','Time','L No.','Theme','Strand','Sub-strand','Lesson Skill','Work Done','Reflection','Signature'];var r=d.lessons.map(function(l){return[l.date||'',l.time||'',l.lno||'',l.theme||'',l.strand||'',l.substrand||'',l.skill||'',l.workdone||'',l.reflect||'',d.s.teacher||''];});xlsxExport(h,r,'ROW','ROW_'+(d.grade?'G'+d.grade+'_':'')+(d.term?'T'+d.term+'_':'')+(d.week?'W'+d.week+'_':'')+new Date().toISOString().slice(0,10)+'.xlsx');}
+async function shareROW(){var d=getROWData();await shareAsFile(d.html+buildRespondSection(),'ROW_'+(d.grade?'G'+d.grade+'_':'')+(d.term?'T'+d.term+'_':'')+(d.week?'W'+d.week+'_':'')+new Date().toISOString().slice(0,10),'ROW');}
+
+// IEP TAB
+function initIEPTab(){renderIEPDB();}
+function newIEPForm(){STATE.editingIEPId=null;document.getElementById('iepFormTitle').textContent='🎯 New IEP';['iep-name','iep-adm','iep-grade','iep-term','iep-dob','iep-parent','iep-contact','iep-date','iep-review','iep-challenges','iep-strengths','iep-goals','iep-strategies','iep-assessment','iep-progress','iep-remarks','iep-parentremarks'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});}
+function saveIEP(){
+  var name=document.getElementById('iep-name').value.trim();if(!name){notify("Please enter the learner's name.",'err');return;}
+  function gv(id){var el=document.getElementById(id);return el?el.value:'';}
+  var iep={id:STATE.editingIEPId||genId(),name:name,adm:gv('iep-adm').trim(),grade:gv('iep-grade'),term:gv('iep-term'),dob:gv('iep-dob'),parent:gv('iep-parent').trim(),contact:gv('iep-contact').trim(),date:gv('iep-date'),review:gv('iep-review'),challenges:gv('iep-challenges').trim(),strengths:gv('iep-strengths').trim(),goals:gv('iep-goals').trim(),strategies:gv('iep-strategies').trim(),assessment:gv('iep-assessment').trim(),progress:gv('iep-progress').trim(),remarks:gv('iep-remarks').trim(),parentremarks:gv('iep-parentremarks').trim(),createdAt:STATE.editingIEPId?(getIEPs().find(function(x){return x.id===STATE.editingIEPId;})||{}).createdAt||Date.now():Date.now(),updatedAt:Date.now()};
+  var ieps=getIEPs();var idx=ieps.findIndex(function(x){return x.id===iep.id;});if(idx>=0)ieps[idx]=iep;else ieps.push(iep);
+  saveIEPsData(ieps);notify(STATE.editingIEPId?'IEP updated!':'IEP saved!');STATE.editingIEPId=null;newIEPForm();renderIEPDB();
+}
+function renderIEPDB(){
+  var fg=document.getElementById('iepFilterGrade').value;var ft=document.getElementById('iepFilterTerm').value;
+  var ieps=getIEPs().filter(function(x){return(!fg||x.grade===fg)&&(!ft||x.term===ft);}).sort(function(a,b){return b.updatedAt-a.updatedAt;});
+  document.getElementById('iepCount').textContent=ieps.length+' IEP'+(ieps.length!==1?'s':'');
+  var today=new Date();today.setHours(0,0,0,0);
+  document.getElementById('iepDB').innerHTML=ieps.length?ieps.map(function(x){var rv=x.review?new Date(x.review):null;if(rv)rv.setHours(0,0,0,0);var diff=rv?Math.floor((rv-today)/86400000):null;var rb=diff!==null?(diff<0?'<span class="badge bg-red">Overdue '+Math.abs(diff)+'d</span>':diff<=7?'<span class="badge bg-yellow">Due '+diff+'d</span>':''):'';
+    return '<div class="iep-card"><div class="lsn-info"><div class="lsn-title">'+escHtml(x.name)+' <span class="badge bg-blue">Gr'+x.grade+'</span> <span class="badge bg-yellow">T'+x.term+'</span> '+rb+'</div><div class="lsn-meta">Adm: '+(x.adm||'–')+' | IEP: '+(x.date||'–')+' | Review: '+(x.review||'–')+'</div></div>'
+    +'<div class="lsn-actions">'
+    +'<button class="btn btn-primary btn-xs" onclick="showPrintPreview(buildIEPHtml(getIEPs().find(function(i){return i.id===\''+x.id+'\';})))">🖨</button>'
+    +'<button class="btn btn-accent btn-xs" onclick="exportSingleIEPXls(\''+x.id+'\')">📊</button>'
+    +'<button class="btn btn-outline btn-xs" onclick="shareIEP(\''+x.id+'\')">📤</button>'
+    +'<button class="btn btn-outline btn-xs" onclick="editIEP(\''+x.id+'\')">✏️</button>'
+    +'<button class="btn btn-danger btn-xs" onclick="deleteIEP(\''+x.id+'\')">🗑</button>'
+    +'</div></div>';}).join(''):'<div class="empty"><div class="empty-icon">🎯</div>No IEPs yet.</div>';
+}
+function editIEP(id){var x=getIEPs().find(function(i){return i.id===id;});if(!x)return;STATE.editingIEPId=id;document.getElementById('iepFormTitle').textContent='✏️ Editing IEP';function sv(eid,v){var el=document.getElementById(eid);if(el)el.value=v||'';}sv('iep-name',x.name);sv('iep-adm',x.adm);sv('iep-grade',x.grade);sv('iep-term',x.term);sv('iep-dob',x.dob);sv('iep-parent',x.parent);sv('iep-contact',x.contact);sv('iep-date',x.date);sv('iep-review',x.review);sv('iep-challenges',x.challenges);sv('iep-strengths',x.strengths);sv('iep-goals',x.goals);sv('iep-strategies',x.strategies);sv('iep-assessment',x.assessment);sv('iep-progress',x.progress);sv('iep-remarks',x.remarks);sv('iep-parentremarks',x.parentremarks);window.scrollTo({top:0,behavior:'smooth'});}
+function deleteIEP(id){if(!confirm('Delete this IEP?'))return;saveIEPsData(getIEPs().filter(function(x){return x.id!==id;}));if(STATE.editingIEPId===id)newIEPForm();renderIEPDB();notify('IEP deleted.');}
+
+function buildIEPHtml(x){
+  if(!x)return '<p>Not found.</p>';
+  var s=getSetup();var sigHtml=s.signature?'<img src="'+s.signature+'" style="height:40px;max-width:160px;display:block">':'<div style="height:40px;border-bottom:1px solid #333;width:160px"></div>';
+  function fld(lbl,v){return '<div class="iep-print-section"><label>'+lbl+'</label><div class="iep-print-box">'+escHtml(v||'–')+'</div></div>';}
+  return '<div class="print-lp-header"><h2>'+escHtml(s.school||'Junior Secondary School')+'</h2><h3>INDIVIDUAL EDUCATION PLAN (IEP)</h3><p>Subject: '+escHtml(s.subject||'English')+' | '+(s.academicYear||'')+'</p></div>'
+    +'<div class="lp-meta-grid" style="grid-template-columns:repeat(3,1fr)"><div class="lp-meta-item"><label>Learner Name</label><span>'+escHtml(x.name)+'</span></div><div class="lp-meta-item"><label>Admission No.</label><span>'+(x.adm||'–')+'</span></div><div class="lp-meta-item"><label>Grade</label><span>'+(x.grade||'–')+'</span></div><div class="lp-meta-item"><label>Term</label><span>'+(x.term||'–')+'</span></div><div class="lp-meta-item"><label>Date of Birth</label><span>'+(x.dob||'–')+'</span></div><div class="lp-meta-item"><label>Date of IEP</label><span>'+(x.date||'–')+'</span></div><div class="lp-meta-item"><label>Parent / Guardian</label><span>'+escHtml(x.parent||'–')+'</span></div><div class="lp-meta-item"><label>Contact</label><span>'+escHtml(x.contact||'–')+'</span></div><div class="lp-meta-item"><label>Review Date</label><span>'+(x.review||'–')+'</span></div></div>'
+    +fld('Nature of Identified Learning Challenges',x.challenges)+fld('Areas of Strength',x.strengths)+fld('Specific Learning Goals for the Term',x.goals)+fld('Support Strategies / Interventions',x.strategies)+fld('Assessment / Monitoring Methods',x.assessment)+fld('Progress Notes',x.progress)+fld("Teacher's Remarks",x.remarks)+fld('Parent / Guardian Remarks',x.parentremarks)
+    +'<div class="sig-row"><div class="sig-block">'+sigHtml+'<div class="sig-line">'+escHtml(s.teacher||'Class Teacher')+' – Signature &amp; Date</div></div><div class="sig-block"><div style="height:40px;border-bottom:1px solid #333;width:160px"></div><div class="sig-line">Parent / Guardian – Signature &amp; Date</div></div><div class="sig-block"><div style="height:40px;border-bottom:1px solid #333;width:160px"></div><div class="sig-line">Head Teacher – Signature &amp; Date</div></div></div>';
+}
+// Share single IEP with interactive respond section
+async function shareIEP(id){var x=getIEPs().find(function(i){return i.id===id;});if(!x)return;await shareAsFile(buildIEPHtml(x)+buildRespondSection(),'IEP_'+(x.name||'').replace(/\s+/g,'_')+'_Gr'+x.grade+'_T'+x.term,'IEP – '+x.name);}
+function exportSingleIEPXls(id){var x=getIEPs().find(function(i){return i.id===id;});if(!x)return;var h=['Name','Adm No.','Grade','Term','DOB','Parent','Contact','IEP Date','Review Date','Challenges','Strengths','Goals','Strategies','Assessment','Progress','Remarks','Parent Remarks'];var r=[[x.name,x.adm,x.grade,x.term,x.dob,x.parent,x.contact,x.date,x.review,x.challenges,x.strengths,x.goals,x.strategies,x.assessment,x.progress,x.remarks,x.parentremarks]];xlsxExport(h,r,'IEP','IEP_'+(x.name||'').replace(/\s+/g,'_')+'.xlsx');}
+function exportAllIEPXls(){var fg=document.getElementById('iepFilterGrade').value;var ft=document.getElementById('iepFilterTerm').value;var ieps=getIEPs().filter(function(x){return(!fg||x.grade===fg)&&(!ft||x.term===ft);});if(!ieps.length){notify('No IEPs.','');return;}var h=['Name','Adm No.','Grade','Term','DOB','Parent','Contact','IEP Date','Review Date','Challenges','Strengths','Goals','Strategies','Assessment','Progress','Remarks','Parent Remarks'];var r=ieps.map(function(x){return[x.name,x.adm,x.grade,x.term,x.dob,x.parent,x.contact,x.date,x.review,x.challenges,x.strengths,x.goals,x.strategies,x.assessment,x.progress,x.remarks,x.parentremarks];});xlsxExport(h,r,'IEPs','IEPs_'+(fg?'G'+fg+'_':'')+(ft?'T'+ft+'_':'')+new Date().toISOString().slice(0,10)+'.xlsx');}
+function printAllIEPs(){var fg=document.getElementById('iepFilterGrade').value;var ft=document.getElementById('iepFilterTerm').value;var ieps=getIEPs().filter(function(x){return(!fg||x.grade===fg)&&(!ft||x.term===ft);});if(!ieps.length){notify('No IEPs to print.','');return;}var html=ieps.map(function(x){return buildIEPHtml(x)+'<div style="page-break-after:always;margin:20px 0;border-top:2px dashed #ccc"></div>';}).join('');showPrintPreview(html);}
+async function shareAllIEPs(){var fg=document.getElementById('iepFilterGrade').value;var ft=document.getElementById('iepFilterTerm').value;var ieps=getIEPs().filter(function(x){return(!fg||x.grade===fg)&&(!ft||x.term===ft);});if(!ieps.length){notify('No IEPs to share.','');return;}var html=ieps.map(function(x){return buildIEPHtml(x)+'<div style="page-break-after:always;margin:20px 0;border-top:2px dashed #ccc"></div>';}).join('')+buildRespondSection();await shareAsFile(html,'IEPs_'+(fg?'G'+fg+'_':'')+(ft?'T'+ft+'_':'')+new Date().toISOString().slice(0,10),'IEPs');}
+
+// TERM PLANNER
+function renderPlanner(){var grade=document.getElementById('planner-grade')?document.getElementById('planner-grade').value:'';var term=document.getElementById('planner-term')?document.getElementById('planner-term').value:'';var el=document.getElementById('plannerGrid');if(!el)return;var lessons=getLessons();if(grade)lessons=lessons.filter(function(l){return l.grade===grade;});if(term)lessons=lessons.filter(function(l){return l.term===term;});var days=['Mon','Tue','Wed','Thu','Fri'];var map={};for(var w=1;w<=14;w++){map[w]={Mon:[],Tue:[],Wed:[],Thu:[],Fri:[]};}lessons.forEach(function(l){var w=parseInt(l.week);var day=l.day?l.day.substring(0,3):'';if(w>=1&&w<=14&&days.indexOf(day)>=0)map[w][day].push(l);});var colW='70px repeat(5,1fr)';var html='<div style="display:grid;grid-template-columns:'+colW+';gap:3px;margin-bottom:4px"><div class="planner-week-label" style="background:var(--accent);color:#1a1000">Wk</div>'+days.map(function(d){return '<div class="planner-day-hdr">'+d+'</div>';}).join('')+'</div>';for(var wk=1;wk<=14;wk++){var total=Object.values(map[wk]).reduce(function(acc,arr){return acc+arr.length;},0);var rowHtml=days.map(function(d){var cell=map[wk][d];return '<div class="planner-cell">'+(cell.length?cell.map(function(l){return '<a class="planner-chip g'+l.grade+'" onclick="switchTab(\'base\');editLesson(\''+l.id+'\')" title="'+escHtml(l.theme||'')+'">Gr'+l.grade+' '+escHtml(l.lno||'')+' '+escHtml((l.strand||'').substring(0,8))+'</a>';}).join(''):'<div class="planner-empty">–</div>')+'</div>';}).join('');html+='<div style="display:grid;grid-template-columns:'+colW+';gap:3px;margin-bottom:2px"><div class="planner-week-label">W'+wk+'<br><span style="font-size:.6rem;opacity:.7">'+total+'ls</span></div>'+rowHtml+'</div>';}el.innerHTML=html;}
+
+// CAL
+function saveCALEntry(){var grade=document.getElementById('cal-grade').value;var learner=document.getElementById('cal-learner').value.trim();var level=document.getElementById('cal-level').value;if(!grade||!learner||!level){notify('Grade, Learner and Level are required.','err');return;}var entry={id:genId(),grade:grade,term:document.getElementById('cal-term').value,learner:learner,level:level,skill:document.getElementById('cal-skill').value.trim(),date:document.getElementById('cal-date').value,notes:document.getElementById('cal-notes').value.trim(),createdAt:Date.now()};var cal=getCAL();cal.push(entry);saveCAL(cal);['cal-learner','cal-skill','cal-notes'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});notify('Entry saved!');renderCALTable();}
+function renderCALTable(){var fg=document.getElementById('calFilterGrade')?document.getElementById('calFilterGrade').value:'';var ft=document.getElementById('calFilterTerm')?document.getElementById('calFilterTerm').value:'';var fl=document.getElementById('calFilterLevel')?document.getElementById('calFilterLevel').value:'';var entries=getCAL().filter(function(e){return(!fg||e.grade===fg)&&(!ft||e.term===ft)&&(!fl||e.level===fl);}).sort(function(a,b){return b.createdAt-a.createdAt;});document.getElementById('calCount').textContent=entries.length+' entr'+(entries.length!==1?'ies':'y');document.getElementById('calList').innerHTML=entries.length?entries.map(function(e){return '<div class="cal-entry-card"><div><b>'+escHtml(e.learner)+'</b> <span class="badge bg-gray">Gr'+e.grade+'</span> T'+(e.term||'–')+'<br><span class="muted">'+escHtml(e.skill||'–')+' · '+(e.date||'–')+'</span>'+(e.notes?'<br><span class="muted" style="font-size:.72rem">'+escHtml(e.notes)+'</span>':'')+'</div><div style="display:flex;align-items:center;gap:6px"><span class="cbl '+e.level+'">'+e.level+'</span><button class="remove-btn" onclick="deleteCALEntry(\''+e.id+'\')">✕</button></div></div>';}).join(''):'<div class="empty"><div class="empty-icon">📊</div>No CAL entries yet.</div>';}
+function deleteCALEntry(id){saveCAL(getCAL().filter(function(e){return e.id!==id;}));renderCALTable();notify('Entry removed.');}
+function exportCALXls(){var fg=document.getElementById('calFilterGrade')?document.getElementById('calFilterGrade').value:'';var ft=document.getElementById('calFilterTerm')?document.getElementById('calFilterTerm').value:'';var entries=getCAL().filter(function(e){return(!fg||e.grade===fg)&&(!ft||e.term===ft);});if(!entries.length){notify('No entries.','');return;}var h=['Learner','Grade','Term','Level','Skill / Outcome','Date','Notes'];var r=entries.map(function(e){return[e.learner,e.grade,e.term,e.level,e.skill||'',e.date||'',e.notes||''];});xlsxExport(h,r,'CAL','CAL_'+(fg?'G'+fg+'_':'')+(ft?'T'+ft+'_':'')+new Date().toISOString().slice(0,10)+'.xlsx');}
+
+// REPORTS
+function generateReport(){
+  var grade=document.getElementById('rpt-grade')?document.getElementById('rpt-grade').value:'';var term=document.getElementById('rpt-term')?document.getElementById('rpt-term').value:'';var el=document.getElementById('reportOutput');if(!el)return;
+  var lessons=getLessons().filter(function(l){return(!grade||l.grade===grade)&&(!term||l.term===term);});
+  var ieps=getIEPs().filter(function(x){return(!grade||x.grade===grade)&&(!term||x.term===term);});
+  var cal=getCAL().filter(function(e){return(!grade||e.grade===grade)&&(!term||e.term===term);});
+  if(!lessons.length&&!ieps.length&&!cal.length){el.innerHTML='<div class="empty"><div class="empty-icon">📈</div>No data for selected filters.</div>';return;}
+  var totals={EE:0,ME:0,AE:0,BE:0};
+  lessons.forEach(function(l){if(l.attainment){totals.EE+=(l.attainment.EE||0);totals.ME+=(l.attainment.ME||0);totals.AE+=(l.attainment.AE||0);totals.BE+=(l.attainment.BE||0);}});
+  cal.forEach(function(e){if(totals[e.level]!==undefined)totals[e.level]++;});
+  var totalAtt=totals.EE+totals.ME+totals.AE+totals.BE;
+  function attBar(level,cls){var pct=totalAtt?Math.round(totals[level]/totalAtt*100):0;return '<div class="att-bar-row"><span style="width:28px;font-weight:700;font-size:.78rem">'+level+'</span><div style="flex:1;background:var(--border);border-radius:3px;height:14px"><div class="att-bar-fill '+cls+'" style="width:'+pct+'%;height:100%;border-radius:3px"></div></div><span style="width:52px;text-align:right;font-size:.78rem">'+totals[level]+' ('+pct+'%)</span></div>';}
+  var strandMap={};lessons.forEach(function(l){if(l.strand)strandMap[l.strand]=(strandMap[l.strand]||0)+1;});
+  var weekSet=new Set(lessons.map(function(l){return l.week;}).filter(Boolean));
+  var today=new Date();today.setHours(0,0,0,0);var overdueIEPs=ieps.filter(function(x){if(!x.review)return false;var rv=new Date(x.review);rv.setHours(0,0,0,0);return rv<today;});
+  el.innerHTML='<div class="report-section"><h3>📊 Summary</h3><div class="stats-grid"><div class="stat-card"><div class="stat-num">'+lessons.length+'</div><div class="stat-lbl">Lessons</div></div><div class="stat-card"><div class="stat-num">'+weekSet.size+'</div><div class="stat-lbl">Weeks Covered</div></div><div class="stat-card"><div class="stat-num">'+ieps.length+'</div><div class="stat-lbl">IEPs</div></div><div class="stat-card"><div class="stat-num">'+cal.length+'</div><div class="stat-lbl">CAL Entries</div></div></div></div>'
+    +(totalAtt?'<div class="report-section"><h3>🎓 CBC Attainment Distribution</h3><div class="muted mb2">'+totalAtt+' total records</div>'+attBar('EE','ee')+attBar('ME','me')+attBar('AE','ae')+attBar('BE','be')+'</div>':'')
+    +(Object.keys(strandMap).length?'<div class="report-section"><h3>🧵 Strand Coverage</h3>'+Object.entries(strandMap).sort(function(a,b){return b[1]-a[1];}).map(function(e){return '<div class="flex-between" style="font-size:.82rem;padding:4px 0;border-bottom:1px solid var(--border-l)"><span>'+escHtml(e[0])+'</span><span class="badge bg-gray">'+e[1]+'</span></div>';}).join('')+'</div>':'')
+    +(ieps.length?'<div class="report-section"><h3>🎯 IEP Status</h3>'+(overdueIEPs.length?'<div class="info-box mb2">⚠️ '+overdueIEPs.length+' IEP(s) with overdue review.</div>':'')+ieps.map(function(x){return '<div class="flex-between" style="font-size:.82rem;padding:4px 0;border-bottom:1px solid var(--border-l)"><span>'+escHtml(x.name)+' <span class="badge bg-gray">Gr'+x.grade+'</span></span><span class="muted">Review: '+(x.review||'not set')+'</span></div>';}).join('')+'</div>':'')
+    +'<div class="btn-group mt2 no-print"><button class="btn btn-accent btn-sm" onclick="exportReportXls()">📊 Export Report Excel</button></div>';
+}
+function exportReportXls(){var grade=document.getElementById('rpt-grade')?document.getElementById('rpt-grade').value:'';var term=document.getElementById('rpt-term')?document.getElementById('rpt-term').value:'';var lessons=getLessons().filter(function(l){return(!grade||l.grade===grade)&&(!term||l.term===term);});if(!lessons.length){notify('No lessons.','');return;}var h=['Grade','Term','Week','L No.','Date','Strand','Sub-strand','Theme','Assessment Methods','Lesson Skill','Work Done','Reflection','EE','ME','AE','BE'];var r=lessons.map(function(l){return[l.grade,l.term,l.week,l.lno,l.date,l.strand,l.substrand,l.theme,l.asm||'',l.skill,l.workdone,l.reflect,(l.attainment||{}).EE||0,(l.attainment||{}).ME||0,(l.attainment||{}).AE||0,(l.attainment||{}).BE||0];});xlsxExport(h,r,'Report','Report_'+(grade?'G'+grade+'_':'')+(term?'T'+term+'_':'')+new Date().toISOString().slice(0,10)+'.xlsx');}
+
+// PRINT PREVIEW
+function buildPrintCSS(){return '*{box-sizing:border-box;margin:0;padding:0}body{font-family:"DM Sans",sans-serif;font-size:12px;color:#111;padding:20px;max-width:210mm;margin:0 auto;line-height:1.5}.print-lp-header{text-align:center;margin-bottom:14px;border-bottom:2px solid #1b4332;padding-bottom:10px}.print-lp-header h2{font-family:"Crimson Pro",serif;font-size:1.35rem;color:#1b4332;font-weight:700}.print-lp-header h3{font-size:.95rem;color:#333;margin-top:3px}.print-lp-header p{font-size:.78rem;color:#555;margin-top:2px}.lp-meta-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;border:1px solid #1b4332;border-radius:4px;padding:7px;margin-bottom:10px}.lp-meta-item label{font-size:.62rem;text-transform:uppercase;font-weight:700;color:#555;display:block}.lp-meta-item span{font-size:.82rem;font-weight:600;color:#1b4332}.lp-section{margin-bottom:8px;border:1px solid #bbb;border-radius:3px;overflow:hidden;page-break-inside:avoid}.lp-section-title{background:#1b4332;color:#fff;padding:4px 9px;font-weight:700;font-size:.76rem;letter-spacing:.3px;-webkit-print-color-adjust:exact;print-color-adjust:exact}.lp-section-body{padding:7px 9px;min-height:28px;white-space:pre-wrap;font-size:.8rem;line-height:1.55}.lp-step-block{border-top:1px solid #e0e0e0;padding:5px 9px;page-break-inside:avoid}.lp-step-label{font-weight:700;color:#1b4332;font-size:.76rem;margin-bottom:2px}.sig-row{display:flex;gap:30px;margin-top:16px;padding-top:10px;border-top:1px solid #ccc;flex-wrap:wrap}.sig-block{text-align:center;margin-bottom:8px}.sig-line{border-top:1px solid #333;margin-top:3px;padding-top:2px;font-size:.7rem;color:#555;width:160px;text-align:center}.print-section-title{font-family:"Crimson Pro",serif;font-size:1.15rem;color:#1b4332;text-align:center;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid #c9963a;white-space:pre-line}table{width:100%;border-collapse:collapse;font-size:.72rem;margin-top:4px}th{background:#1b4332;color:#fff;padding:4px 6px;text-align:left;font-size:.69rem;-webkit-print-color-adjust:exact;print-color-adjust:exact}td{border:1px solid #bbb;padding:4px 6px;vertical-align:top;white-space:pre-wrap}.iep-print-section{margin-bottom:8px;page-break-inside:avoid}.iep-print-section label{font-weight:700;font-size:.73rem;text-transform:uppercase;color:#1b4332;display:block;margin-bottom:2px}.iep-print-box{border:1px solid #bbb;border-radius:3px;padding:6px;min-height:28px;font-size:.8rem;white-space:pre-wrap}.att-print-row{display:flex;gap:14px;margin:8px 0;flex-wrap:wrap}.att-print-box{border:1px solid #bbb;padding:6px 12px;border-radius:4px;text-align:center;font-size:.78rem}.att-print-box .lbl{font-weight:700;font-size:.9rem}@media print{#r-actions{display:none!important}.respond-section-label{display:none!important}}';}
+function showPrintPreview(html){var full='<!DOCTYPE html><html><head><meta charset="UTF-8"><link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"><style>'+buildPrintCSS()+'</style></head><body>'+html+'</body></html>';var blob=new Blob([full],{type:'text/html;charset=utf-8'});var blobUrl=URL.createObjectURL(blob);var ov=document.getElementById('printPreviewOv');if(!ov){ov=document.createElement('div');ov.id='printPreviewOv';ov.className='modal-ov';document.body.appendChild(ov);}ov.innerHTML='<div class="modal" style="max-width:860px;padding:16px"><div class="modal-hdr"><span class="modal-title">🖨 Print Preview</span><div class="btn-group"><button class="btn btn-primary btn-sm" onclick="doPrintBlob(\''+blobUrl+'\')">🖨 Print / Save PDF</button><button class="btn btn-ghost btn-sm" onclick="document.getElementById(\'printPreviewOv\').style.display=\'none\'">✕</button></div></div><iframe class="preview-frame" src="'+blobUrl+'" title="Print preview"></iframe></div>';ov.style.display='flex';setTimeout(function(){URL.revokeObjectURL(blobUrl);},120000);}
+function doPrintBlob(url){var win=window.open(url,'_blank');if(!win){var a=document.createElement('a');a.href=url;a.download='print_document.html';a.click();notify('Popup blocked – file downloaded. Open to print.','');}}
+
+// SHARE
+async function shareAsFile(htmlContent,filename,title){var full='<!DOCTYPE html><html><head><meta charset="UTF-8"><link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"><style>'+buildPrintCSS()+'</style></head><body>'+htmlContent+'</body></html>';var blob=new Blob([full],{type:'text/html;charset=utf-8'});var file=new File([blob],filename+'.html',{type:'text/html'});if(navigator.share){try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:title,text:'English TPDS – '+title});return;}var url=URL.createObjectURL(blob);await navigator.share({title:title,text:'English TPDS – '+title,url:url});setTimeout(function(){URL.revokeObjectURL(url);},30000);return;}catch(e){if(e.name==='AbortError')return;}}var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename+'.html';a.click();notify('File downloaded – open to print or share.');}
+
+// EXCEL EXPORT
+function xlsxExport(headers,rows,sheetName,filename){if(typeof XLSX==='undefined'){notify('SheetJS not loaded – need internet.','err');return;}var ws=XLSX.utils.aoa_to_sheet([headers].concat(rows));ws['!cols']=headers.map(function(h,i){var max=Math.max(h.length,rows.length?Math.max.apply(null,rows.map(function(r){return String(r[i]||'').split('\n')[0].length;})):0);return{wch:Math.min(52,Math.max(10,max+2))};});var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,sheetName);XLSX.writeFile(wb,filename);notify('Exported: '+filename);}
+
+// TABLE BUILDERS
+function buildTable(title,hdrs,rows,isSow,forPrint){var cls='data-table '+(isSow?'sow-table':'row-table');var thHtml=hdrs.map(function(h){return '<th>'+escHtml(h)+'</th>';}).join('');var trHtml=rows.length?rows.map(function(r){return '<tr>'+r.map(function(c){return '<td style="white-space:pre-wrap">'+escHtml(c)+'</td>';}).join('')+'</tr>';}).join(''):'<tr><td colspan="'+hdrs.length+'" style="text-align:center;color:#999;padding:18px">No records for selected filters.</td></tr>';var titleHtml=title?'<div class="section-head mb2">'+escHtml(title)+'</div>':'';var tbl='<table class="'+cls+'"><thead><tr>'+thHtml+'</tr></thead><tbody>'+trHtml+'</tbody></table>';return forPrint?tbl:(titleHtml+'<div class="tbl-wrap">'+tbl+'</div>');}
+function buildTableRaw(hdrs,rows,isSow){var cls='data-table '+(isSow?'sow-table':'row-table');var thHtml=hdrs.map(function(h){return '<th>'+escHtml(h)+'</th>';}).join('');var trHtml=rows.length?rows.map(function(r){return '<tr>'+r.map(function(c){return '<td style="white-space:pre-wrap">'+c+'</td>';}).join('')+'</tr>';}).join(''):'<tr><td colspan="'+hdrs.length+'" style="text-align:center;color:#999;padding:18px">No records.</td></tr>';return '<table class="'+cls+'"><thead><tr>'+thHtml+'</tr></thead><tbody>'+trHtml+'</tbody></table>';}
+
+// AUTO-NUMBERING
+var ROMANS=['i','ii','iii','iv','v','vi','vii','viii','ix','x','xi','xii','xiii','xiv','xv','xvi','xvii','xviii','xix','xx'];
+function nextRoman(r){var i=ROMANS.indexOf(r.toLowerCase());return i>=0&&i<ROMANS.length-1?ROMANS[i+1]:r+'i';}
+function handleAutoNumber(e){if(e.key!=='Enter')return;var ta=e.target;var text=ta.value;var sel=ta.selectionStart;var before=text.substring(0,sel);var after=text.substring(sel);var lastNL=before.lastIndexOf('\n');var curLine=before.substring(lastNL+1);var next=null;if(curLine.trim()==='By the end of the lesson, the learner should be able to:'){next='a) ';}else if(curLine.trim()==='The learner is guided to:'){next='• ';}else if(/^•\s/.test(curLine)){next='• ';}else if(/^([a-z])\)\s/.test(curLine)){var ch=curLine.match(/^([a-z])/)[1];next=String.fromCharCode(ch.charCodeAt(0)+1)+') ';}else if(/^(\d+)\.\s/.test(curLine)){var n=parseInt(curLine.match(/^(\d+)/)[1]);next=(n+1)+'. ';}else if(/^~\s/.test(curLine)){next='~ ';}else if(/^([ivxlc]+)\.\s/i.test(curLine)){var rr=curLine.match(/^([ivxlc]+)/i)[1];next=nextRoman(rr)+'. ';}else if(/^([ivxlc]+)\)\s/i.test(curLine)){var rr2=curLine.match(/^([ivxlc]+)/i)[1];next=nextRoman(rr2)+') ';}if(next!==null){e.preventDefault();var newText=before+'\n'+next+after;ta.value=newText;var pos=sel+1+next.length;ta.setSelectionRange(pos,pos);autoResize(ta);}}
+
+// UTILS
+function escHtml(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function autoResize(ta){ta.style.height='auto';ta.style.height=(ta.scrollHeight+4)+'px';}
+
+// SCROLL TO TOP
+function initScrollTop(){var btn=document.getElementById('scrollTopBtn');if(!btn)return;window.addEventListener('scroll',function(){btn.classList.toggle('show',window.scrollY>250);},{passive:true});btn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});}
+
+// INIT
+document.addEventListener('DOMContentLoaded',function(){
+  applyDark();
+  if(sessionStorage.getItem('tpds_auth')!=='1'){
+    try{var s=JSON.parse(localStorage.getItem(SK.setup)||'{}');if(s.school){var el=document.getElementById('lgSchool');if(el){el.textContent=s.school;el.style.display='block';}}if(s.academicYear){var el2=document.getElementById('lgYear');if(el2)el2.textContent='Academic Year '+s.academicYear;}}catch(e2){}
+    document.getElementById('loginOverlay').style.display='flex';
+  } else {
+    document.getElementById('loginOverlay').style.display='none';switchTab('home');
+  }
+  document.addEventListener('keydown',function(e){if(e.target.tagName==='TEXTAREA')handleAutoNumber(e);});
+  document.getElementById('themeInput')&&document.getElementById('themeInput').addEventListener('keydown',function(e){if(e.key==='Enter')addTheme();});
+  document.getElementById('strandInput')&&document.getElementById('strandInput').addEventListener('keydown',function(e){if(e.key==='Enter')addStrand();});
+  document.getElementById('loginPass')&&document.getElementById('loginPass').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
+  document.getElementById('b-term')&&document.getElementById('b-term').addEventListener('change',autoGenerateLNo);
+  document.getElementById('b-week')&&document.getElementById('b-week').addEventListener('change',autoGenerateLNo);
+  document.querySelectorAll('[id^="b-att-"]').forEach(function(el){el.addEventListener('input',updateAttTotal);});
+  initScrollTop();updateHeader();
+});
+
+</script>
+
+<script id="pwa-installer">
+(function(){
+  var mj='{"name":"English TPDS v3","short_name":"TPDS","description":"English Teaching & Planning Document System","start_url":"./","display":"standalone","orientation":"portrait-primary","background_color":"#1b4332","theme_color":"#1b4332","categories":["education","productivity"],"icons":[{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAABICAYAAABV7bNHAAAAjElEQVR42u3YMQ0AMAgEQHzURS3gX1OroAuEdDmSH1lu+nys3Efeiepj5QABAjQK9PsAAQIECBAgQIAAAQIECBAgQIAAAbIomlwBAQIECBAgPQgQIECAAAECBAgQIECAAAECBAgQIIsiIECAAAECBEgPAgQIECBAgAABAgQIECBAgAABAgTIoggIUDsXSp7I2VqToakAAAAASUVORK5CYII=","sizes":"72x72","type":"image/png","purpose":"any maskable"},{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAACeElEQVR42u3bsQ0AIQwEQfdBF7Tg/muCFgitY1a6/CWYz6jV+5j9upr4UZNySQAAwAAAwAAAwAAAwAAAwAAAwAAAwAAAwACIBKDsHwoAAgAAAQCAAABAAAAgAAAQAAAIAAAEAAACAAABAIAAAEAAACAAABAAAAgAAAQAAAIAAAEAgAAAQAAAIAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAABAIAAAEAAACAAABAAAAgAAAQAAAIAAAEAgAAAQAAAIAAAEAAARB6YAQCAAQCAAQCAAQCAAQCAAQCAAQCAAQCAAQCAAQCAAQCAAQCAAQCAAQCAAQCAAQAAAAAAAAAAAAAAgLwJBkAAACAAABAAAAgAAAQAAAIAAAEAgAAAQAAAIAAAEAAACAAABAAAAgAAAQCAAABAAAAgAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAEAgAAAQAAAIAAAEAAACAAABAAAAgAAAQCAAABAAAAgAAAQAAAIAAAEAAACAICEAzMAADAAADAAADAAADAAADAAADAAADAAADAAADAAADAAADAAADAAADAAADAAADAAAAAAAAAAAAAAAACQN8EACAAABAAAAgAAAQCAAABAAAAgAAAQAAAIAAAEAAACAAABAIAAAEAAACAAABAAAAgAAAQAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAgAAAQAAAIAAAEAAACAAABAIAAAEAAACAAABAAAAgAAAQAAAIAAAEAgAAAQAAAkHBgBgAABgAABgAABgAABgAABgAABgAABgAA9rYLS+VT27mKScwAAAAASUVORK5CYII=","sizes":"192x192","type":"image/png","purpose":"any maskable"},{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAYAAAD0eNT6AAANbklEQVR42u3WQQ0AMQhFQXzgohbwrwlUNByYl3wDZNOdyHptZmZmtxaOYGZmBgC2MO3l+zMzADAAAAAzMwAwAAAAMzMAMAAAADMzADAAAAAzMwAwAAAAMzMAMAAAADMzADAAAAAzMwAwAAAAMzMAMH9hADAzAwAAEACYmQEAAAgAzMwAAAAEAGZmAAAAAgAzMwAAAAGAmRkAAIAAwMwMAABAAGBmBgAAIAAwMwAwAAAAMzMAMAAAADMzADAAAAAzMwAwAAAAMzMAMAAAADMzADAAAAAzMwAwAAAAMzMAMACQJAAHAAMASQBgAAAAkgQABgAAIEkAYAAAAJIEAAYAACBJAGAAAACSBAAGAAAgSQBgAAAAkgQABgAAIEkAAAAOAQCSBAAAYAAgSQAAAAYAkgQAAGAAIEkAAAAGAJIEAABgACBJAAAABgCSBAAAYAAgSQAAAAYAkgDAAAAAJAkADAAAQJIAwAAAACQJAAwAAECSAMAAAAAkCQAMAABAkgDAAAAAJAkADAAAQJIAAAAcAQAkCQAAwABAkgAAAAwAJAkAAMAAQJIAAAAMACQJAADAAECSAAAADAAkCQAAwABAkgAAAAwAJAGAAQAASBIAGAAAgCQBgAEAAEgSABgAAIAkAYABAABIEgAYAACAJAGAAQAASBIAGAAAgCQBgAEAAEgSAACAAYAkAQAAGABIEgAAgAGAJAEAABgASBIAAIABgCQBAAAYAEgSAACAAYAkAQAAGABIAgDvPwAAgCQBgAEAAEgSABgAAIAkAYABAABIEgAYAACAJAGAAQAASBIAGAAAgCQBgAEAAEgSABgAAIAkAQAAGABIEgAAgAGAJAEAABgASBIAAIABgCQBAAAYAEgSAACAAYAkAQAAGABIEgAAgAGAJAEAAJhXQBIAGAAAgCQBgAEAAEgSABgAAIAkAYABAABIEgAYAACAJAGAAQAASBIAGAAAgCQBgAEAAEgSAACAAYAkAQAAGABIEgAAgAGAJAEAABgASBIAAIABgCQBAAAYAEgSAACAAYAkAQAAGABIEgAAgAGAJAAwAAAASQIAAwAAkCQAMAAAAEkCAAMAAJAkADAAAABJAgADAACQJAAwAAAASQIAAwAAkCQAAACHAABJAgAAMACQJAAAAAMASQIAADAAkCQAAAADAEkCAAAwAJAkAAAAAwBJAgAAMACQJAAAAAMASQBgAAAAkgQABgAAIEkAYAAAAJIEAAYAACBJAGAAAACSBAAGAAAgSQBgAAAAkgQABgAAIEkAAACOAACSBAAAYAAgSQAAAAYAkgQAAGAAIEkAAAAGAJIEAABgACBJAAAABgAeIDMzADAAAAAzMwAwAAAAMzMAAAABgJkZAACAAMDMDAAAQABgZgYAACAAMDMDAAAQAJiZAQAACADMzAAAAAQAZmYAAAACADMzAAAAADAzAwADAAAwMwMAAwAAMDMDAAMAADAzAwADAAAwMwMAAwAAMDMDAAMAADAzAwADAAAwMwMAAwAAMDMDAAAQAJiZAQAACADMzAAAAAQAZmYAAAACADMzAAAAAYCZGQAAgADAzAwAAEAAYGYGAAAgADAzAwAAkO/PzADAAAAAzMwAwAAAAMzMAMAAAADMzADAAAAAzMwAwAAAAMzMAMAAAADMzADAAAAAzMwAwAAAAMzMAMD8hQHAzAwAAEAAYGYGAAAgADAzAwAAEACYmQEAAAgAzMwAAAAEAGZmAAAAAgAzMwAAAAGAmRkAAIAAwMwAwAAAAMzMAMAAAADMzADAAAAAzMwAwAAAAMzMAMAAAADMzADAAECSABwADAAkCQAAwABAkgAAAAwAJAGAAQAASBIAGAAAgCQBgAEAAEgSABgAAIAkAYABAABIEgAYAACAJAGAAQAASBIAGAAAgCQBAAA4BABIEgAAgAGAJAEAABgASBIAAIABgCQBAAAYAEgSAACAAYAkAQAAGABIEgAAgAGAJAEAABgASAIAAwAAkCQAMAAAAEkCAAMAAJAkADAAAABJAgADAACQJAAwAAAASQIAAwAAkCQAMAAAAEkCAABwBACQJAAAAAMASQIAADAAkCQAAAADAEkCAAAwAJAkAAAAAwBJAgAAMACQJAAAAAMASQIAADAAkAQABgAAIEkAYAAAAJIEAAYAACBJAGAAAACSBAAGAAAgSQBgAAAAkgQABgAAIEkAYAAAAJIEAAYAACBJAAAABgCSBAAAYAAgSQAAAAYAkgQAAGAAIEkAAAAGAJIEAABgACBJAAAABgCSBAAAYAAgCQC8/wAAAJIEAAYAACBJAGAAAACSBAAGAAAgSQBgAAAAkgQABgAAIEkAYAAAAJIEAAYAACBJAGAAAACSBAAAYAAgSQAAAAYAkgQAAGAAIEkAAAAGAJIEAABgACBJAAAABgCSBAAAYAAgSQAAAAYAkgQAAGBeAUkAYAAAAJIEAAYAACBJAGAAAACSBAAGAAAgSQBgAAAAkgQABgAAIEkAYAAAAJIEAAYAACBJAAAABgCSBAAAYAAgSQAAAAYAkgQAAGAAIEkAAAAGAJIEAABgACBJAAAABgCSBAAAYAAgSQAAAAYAkgDAAAAAJAkADAAAQJIAwAAAACQJAAwAAECSAMAAAAAkCQAMAABAkgDAAAAAJAkADAAAQJIAAAAcAgAkCQAAwABAkgAAAAwAJAkAAMAAQJIAAAAMACQJAADAAECSAAAADAAkCQAAwABAkgAAAAwAJAGAAQAASBIAGAAAgCQBgAEAAEgSABgAAIAkAYABAABIEgAYAACAJAGAAQAASBIAGAAAgCQBAAA4AgBIEgAAgAGAJAEAABgASBIAAIABgCQBAAAYAHiAzMwAwAAAAMzMAMAAAADMzADAAAAAzMwAwAAAAMzMAAAABABmZgAAAAIAMzMAAAABgJkZAACAAMDMDAAAQABgZgYAACAAMDMDAAAQAJiZAQAACADMzAAAAADAzAwADAAAwMwMAAwAAMDMDAAMAADAzAwADAAAwMwMAAwAAMDMDAAMAADAzAwADAAAwMwMAAwAAMDMDAAAQABgZgYAACAAMDMDAAAQAJiZAQAACADMzAAAAAQAZmYAAAACADMzAAAAAYCZGQAAgADAzAwAAEC+PzMDAAMAADAzAwADAAAwMwMAAwAAMDMDAAMAADAzAwADAAAwMwMAAwAAMDMDAAMAADAzAwADAAAwMwMA8xcGADMzAAAAAYCZGQAAgADAzAwAAEAAYGYGAAAgADAzAwAAEACYmQEAAAgAzMwAAAAEAGZmAAAAAgAzAwADAAAwMwMAAwAAMDMDAAMAADAzAwADAEkCcAAwAJAkAAAAAwBJAgAAMACQJAAAAAMASQIAADAAkAQABgAAIEkAYAAAAJIEAAYAACBJAGAAAACSBAAGAAAgSQBgAAAAkgQABgAAIEkAYAAAAJIEAADgEAAgSQAAAAYAkgQAAGAAIEkAAAAGAJIEAABgACBJAAAABgCSBAAAYAAgSQAAAAYAkgQAAGAAIAkADAAAQJIAwAAAACQJAAwAAECSAMAAAAAkCQAMAABAkgDAAAAAJAkADAAAQJIAwAAAACQJAADAEQBAkgAAAAwAJAkAAMAAQJIAAAAMACQJAADAAECSAAAADAAkCQAAwABAkgAAAAwAJAkAAMAAQBIAGAAAgCQBgAEAAEgSABgAAIAkAYABAABIEgAYAACAJAGAAQAASBIAGAAAgCQBgAEAAEgSABgAAIAkAQAAGABIEgAAgAGAJAEAABgASBIAAIABgCQBAAAYAEgSAACAAYAkAQAAGABIEgAAgAGAJADw/gMAAEgSABgAAIAkAYABAABIEgAYAACAJAGAAQAASBIAGAAAgCQBgAEAAEgSABgAAIAkAYABAABIEgAAgAGAJAEAABgASBIAAIABgCQBAAAYAEgSAACAAYAkAQAAGABIEgAAgAGAJAEAABgASBIAAIB5BSQBgAEAAEgSABgAAIAkAYABAABIEgAYAACAJAGAAQAASBIAGAAAgCQBgAEAAEgSABgAAIAkAQAAGABIEgAAgAGAJAEAABgASBIAAIABgCQBAAAYAEgSAACAAYAkAQAAGABIEgAAgAGAJAEAABgASAIAAwAAkCQAMAAAAEkCAAMAAJAkADAAAABJAgADAACQJAAwAAAASQIAAwAAkCQAMAAAAEkCAABwCACQJAAAAAMASQIAADAAkCQAAAADAEkCAAAwAJAkAAAAAwBJAgAAMACQJAAAAAMASQIAADAAkAQABgAAIEkAYAAAAJIEAAYAACBJAGAAAACSBAAGAAAgSQBgAAAAkgQABgAAIEkAYAAAAJIEAADgCAAgSQAAAAYAkgQAAGAA4AEyMwMAAwAAMDMDAAMAADAzAwADAAAwMwMAAwAAMDMDAAMAADAzAwADAAAwMwMAABAAmJkBAAAIAMzMAAAABABmZgAAAAIAMzMAAAABgJkZAACAAMDMDAAAQABgZgYAACAAMDMDAAAAADMzADAAAAAzMwAwAAAAMzMAMAAAADMzADAAAAAzMwAwAAAAMzMAMAAAADMzADAAAAAzMwAwAAAAMzMAAAABgJkZAJiZmdnnDWLjmEwFFRlIAAAAAElFTkSuQmCC","sizes":"512x512","type":"image/png","purpose":"any maskable"}],"prefer_related_applications":false}';
+  var mblob=new Blob([mj],{type:"application/manifest+json"});
+  var mlink=document.createElement("link");
+  mlink.rel="manifest";mlink.href=URL.createObjectURL(mblob);
+  document.head.appendChild(mlink);
+  if(!("serviceWorker" in navigator)){
+    console.log("[TPDS] SW not supported");return;
+  }
+  var swLines=[
+    "var CACHE='tpds-v1';",
+    "var ASSETS=['./'];",
+    "self.addEventListener('install',function(e){",
+    "  e.waitUntil(caches.open(CACHE).then(function(c){return c.addAll(ASSETS);}).then(function(){return self.skipWaiting();}));",
+    "});",
+    "self.addEventListener('activate',function(e){",
+    "  e.waitUntil(caches.keys().then(function(keys){",
+    "    return Promise.all(keys.filter(function(k){return k!==CACHE;}).map(function(k){return caches.delete(k);}));",
+    "  }).then(function(){return self.clients.claim();}));",
+    "});",
+    "self.addEventListener('fetch',function(e){",
+    "  if(e.request.method!=='GET')return;",
+    "  e.respondWith(",
+    "    caches.match(e.request).then(function(cached){",
+    "      var net=fetch(e.request).then(function(r){",
+    "        if(r&&r.status===200){var cl=r.clone();caches.open(CACHE).then(function(c){c.put(e.request,cl);}); }",
+    "        return r;",
+    "      }).catch(function(){return cached||new Response('Offline',{status:503,statusText:'Service Unavailable'});});",
+    "      return cached||net;",
+    "    })",
+    "  );",
+    "});"  ];
+  var swBlob=new Blob([swLines.join("\n")],{type:"application/javascript"});
+  var swUrl=URL.createObjectURL(swBlob);
+  navigator.serviceWorker.register(swUrl,{scope:"./"})
+    .then(function(r){console.log("[TPDS] SW registered",r.scope);})
+    .catch(function(e){console.warn("[TPDS] SW failed:",e);});
+})();
+
+var _tpdsPrompt=null,_tpdsBannerShown=false;
+window.addEventListener("beforeinstallprompt",function(e){
+  e.preventDefault();
+  _tpdsPrompt=e;
+  if(!_tpdsBannerShown&&!window.matchMedia("(display-mode: standalone)").matches){
+    setTimeout(showTpdsBanner,3000);
+  }
+});
+window.addEventListener("appinstalled",function(){
+  _tpdsPrompt=null;
+  var b=document.getElementById("tpds-install-bar");
+  if(b)b.remove();
+  console.log("[TPDS] App installed!");
+});
+
+function showTpdsBanner(){
+  if(document.getElementById("tpds-install-bar"))return;
+  if(window.matchMedia("(display-mode: standalone)").matches)return;
+  _tpdsBannerShown=true;
+  var isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
+  var bar=document.createElement("div");
+  bar.id="tpds-install-bar";
+  bar.style.cssText=(
+    "position:fixed;bottom:0;left:0;right:0;z-index:99999;padding-bottom:env(safe-area-inset-bottom,0px);"
+    +"background:linear-gradient(135deg,#1b4332,#2d6a4f);"
+    +"color:#fff;padding:12px 16px;"
+    +"display:flex;align-items:center;gap:10px;"
+    +"box-shadow:0 -3px 20px rgba(0,0,0,.35);"
+    +"font-family:'DM Sans',sans-serif;"
+    +"border-top:2px solid #c9963a;"
+  );
+  var icon=document.createElement("div");
+  icon.style.cssText="font-size:26px;flex-shrink:0;";
+  icon.textContent="\uD83D\uDCDA";
+  var txt=document.createElement("div");
+  txt.style.flex="1";
+  var t1=document.createElement("div");
+  t1.style.cssText="font-weight:700;font-size:13px;";
+  t1.textContent="Install English TPDS";
+  var t2=document.createElement("div");
+  t2.style.cssText="font-size:11px;opacity:.8;margin-top:2px;";
+  t2.textContent=isIOS?"Tap Share \u2192 Add to Home Screen":"Install as app \u2014 works offline";
+  txt.appendChild(t1);
+  txt.appendChild(t2);
+  var close=document.createElement("button");
+  close.style.cssText=(
+    "background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);"
+    +"color:#fff;padding:6px 11px;border-radius:6px;"
+    +"font-size:12px;font-weight:600;cursor:pointer;"
+    +"font-family:'DM Sans',sans-serif;white-space:nowrap;"
+  );
+  close.textContent="Not now";
+  close.onclick=function(){bar.remove();};
+  bar.appendChild(icon);
+  bar.appendChild(txt);
+  if(!isIOS){
+    var installBtn=document.createElement("button");
+    installBtn.style.cssText=(
+      "background:#c9963a;border:none;color:#fff;"
+      +"padding:8px 16px;border-radius:6px;"
+      +"font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0;"
+      +"font-family:'DM Sans',sans-serif;white-space:nowrap;"
+    );
+    installBtn.textContent="\u2913 Install";
+    installBtn.onclick=function(){
+      if(!_tpdsPrompt)return;
+      _tpdsPrompt.prompt();
+      _tpdsPrompt.userChoice.then(function(r){
+        _tpdsPrompt=null;
+        bar.remove();
+        console.log("[TPDS] Install choice:",r.outcome);
+      });
+    };
+    bar.appendChild(installBtn);
+  }
+  bar.appendChild(close);
+  document.body.appendChild(bar);
+}
+
+function tpdsConnStatus(){
+  var dot=document.getElementById("tpds-dot");
+  var on=navigator.onLine;
+  if(!dot){
+    dot=document.createElement("span");
+    dot.id="tpds-dot";
+    dot.title=on?"Online":"Offline";
+    dot.style.cssText=(
+      "display:inline-block;width:8px;height:8px;"
+      +"border-radius:50%;margin-left:8px;"
+      +"background:"+(on?"#4ade80":"#f87171")+";"  
+      +"box-shadow:0 0 6px "+(on?"#4ade80":"#f87171")+";"  
+      +"vertical-align:middle;flex-shrink:0;"
+    );
+    var hdr=document.querySelector(".hdr-actions");
+    if(hdr)hdr.insertBefore(dot,hdr.firstChild);
+    else document.querySelector(".app-header")&&document.querySelector(".app-header").appendChild(dot);
+  }
+  dot.style.background=on?"#4ade80":"#f87171";
+  dot.style.boxShadow="0 0 6px "+(on?"#4ade80":"#f87171");
+  dot.title=on?"Online":"Offline";
+  if(!on){
+    var nt=document.getElementById("tpds-offline-toast");
+    if(!nt){
+      nt=document.createElement("div");
+      nt.id="tpds-offline-toast";
+      nt.style.cssText=(
+        "position:fixed;top:70px;left:50%;transform:translateX(-50%);"
+        +"background:#1b4332;color:#fff;padding:8px 20px;"
+        +"border-radius:8px;font-size:12px;font-weight:600;"
+        +"z-index:9990;white-space:nowrap;"
+        +"box-shadow:0 4px 14px rgba(0,0,0,.3);"
+        +"font-family:'DM Sans',sans-serif;"
+        +"border:1px solid #c9963a;"
+      );
+      nt.textContent="\u26A0\uFE0F Offline \u2014 data saved locally";
+      document.body.appendChild(nt);
+      setTimeout(function(){if(nt)nt.remove();},4500);
+    }
+  }
+}
+window.addEventListener("online",tpdsConnStatus);
+window.addEventListener("offline",tpdsConnStatus);
+window.addEventListener("load",tpdsConnStatus);
+</script>
+</body>
+</html>
